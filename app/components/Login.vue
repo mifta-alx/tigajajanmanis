@@ -49,7 +49,9 @@ const handleLogin = async () => {
       showAlert.value = false;
     }, 5000);
   } else {
-    return navigateTo("/admin/dashboard", {
+    const client = useSupabaseClient();
+    await client.auth.getSession();
+    await navigateTo("/admin/dashboard", {
       replace: true,
       external: false,
     });
@@ -126,7 +128,7 @@ const handleLogin = async () => {
         </Button>
       </Field>
       <Field>
-        <FieldDescription class="text-center">
+        <FieldDescription class="text-center flex flex-col">
           <span class="text-xs text-muted-foreground leading-relaxed">
             Forgot your password or can't login? <br />
             Please contact your <strong>System Administrator</strong> to reset
