@@ -29,10 +29,9 @@ export const useUser = () => {
 
   const deleteUser = async (id: string) => {
     try {
-      const response = await $fetch(`/api/users/${id}`, {
+      return await $fetch(`/api/users/${id}`, {
         method: "DELETE",
       });
-      return response;
     } catch (error) {
       console.error("Error deleting user:", error);
       throw error;
