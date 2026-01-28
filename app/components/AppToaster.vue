@@ -53,26 +53,3 @@ const icon = {
     </TransitionGroup>
   </div>
 </template>
-
-<style scoped>
-/* Animasi Slide-up ala Sonner */
-.sonner-enter-active,
-.sonner-leave-active {
-  transition: all 0.35s cubic-bezier(0.21, 1.02, 0.73, 1);
-}
-
-.sonner-enter-from {
-  transform: translateY(100%) scale(0.9);
-  opacity: 0;
-}
-
-.sonner-leave-to {
-  transform: scale(0.9);
-  opacity: 0;
-}
-
-/* Membuat stack jika ada banyak (opsional, visual tipis) */
-.sonner-move {
-  transition: transform 0.35s ease;
-}
-</style>

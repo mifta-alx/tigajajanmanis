@@ -6,16 +6,14 @@ export const useAuth = () => {
 
   const login = async (usernameInput: string, password: string) => {
     loading.value = true;
-    const email = `${usernameInput}@tigajajanmanis.com`;
 
     try {
-      const { data: userExists } = await client
-        .from("profiles")
-        .select("id")
-        .eq("username", usernameInput)
-        .maybeSingle();
+      const { exists } = await $fetch(`/api/auth/check-user`, {
+        method: "POST",
+        body: { username: usernameInput },
+      });
 
-      if (!userExists) {
+      if (!exists) {
         throw {
           title: "Account Not Found",
           description:
@@ -23,11 +21,11 @@ export const useAuth = () => {
         };
       }
 
+      const email = `${usernameInput.toLowerCase()}@tigajajanmanis.com`;
       const { data, error: authError } = await client.auth.signInWithPassword({
         email,
         password,
       });
-
       if (authError) {
         throw {
           title: "Authentication Failed",
@@ -38,7 +36,6 @@ export const useAuth = () => {
 
       return { data, error: null };
     } catch (err: any) {
-      console.log(err);
       const errorObj = err.title
         ? err
         : {
@@ -54,8 +51,6 @@ export const useAuth = () => {
 
   const logout = async () => {
     await client.auth.signOut();
-    userRole.value = null;
-    username.value = null;
     navigateTo("/login");
   };
 
