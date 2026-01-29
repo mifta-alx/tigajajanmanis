@@ -36,27 +36,31 @@ const handleLogin = async () => {
   touched.value = { username: true, password: true };
 
   if (errors.value.username || errors.value.password) return;
-
-  const { error } = await login(
-    formLogin.value.username,
-    formLogin.value.password,
-  );
-
-  if (error) {
-    showAlert.value = true;
-    errorMessage.value = error;
-
-    setTimeout(() => {
-      showAlert.value = false;
-    }, 5000);
-  } else {
-    isNavigating.value = true;
+  isNavigating.value = true;
+  try {
+    const { error } = await login(
+      formLogin.value.username,
+      formLogin.value.password,
+    );
+    if (error) {
+      showAlert.value = true;
+      errorMessage.value = error;
+      isNavigating.value = false;
+      setTimeout(() => {
+        showAlert.value = false;
+      }, 5000);
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100));
     const client = useSupabaseClient();
     await client.auth.getSession();
     await navigateTo("/admin/dashboard", {
       replace: true,
       external: false,
     });
+  } catch (err) {
+    console.error("Login catch error:", err);
+    isNavigating.value = false;
   }
 };
 
@@ -128,7 +132,7 @@ const isProcessing = computed(() => loading.value || isNavigating.value);
       </Field>
       <Field>
         <Button type="submit" :disabled="isProcessing">
-          {{ isProcessing ? "Memproses..." : "Login" }}
+          {{ isProcessing ? "Processing..." : "Login" }}
         </Button>
       </Field>
       <Field>
