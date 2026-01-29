@@ -7,6 +7,7 @@ export interface User {
   phoneNumber: string;
   address: string | null;
   role: Role;
+  status: 0 | 1;
   createdAt: string;
   updatedAt: string;
 }

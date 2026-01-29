@@ -3,6 +3,7 @@ import type { ColumnDef } from "@tanstack/vue-table";
 import type { User } from "~/types/models";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import Switch from "~/components/Switch.vue";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +16,9 @@ import { AlertDialogTrigger } from "~/components/ui/alert-dialog";
 
 export const getColumns = (
   onDelete: (id: string) => void,
+  onStatusChange: (id: string, newStatus: number) => void,
   currentUserId: string | undefined,
+  updatingIds: Ref<Set<string>>,
 ): ColumnDef<User>[] => [
   {
     accessorKey: "number",
@@ -59,6 +62,30 @@ export const getColumns = (
       const val = row.getValue("address") as string;
       const address = val && val.trim() !== "" ? val : "-";
       return h("div", { class: "text-wrap" }, address);
+    },
+  },
+  {
+    accessorKey: "status",
+    header: () => h("div", { class: "text-center" }, "Status"),
+    size: 64,
+    cell: ({ row }) => {
+      const user = row.original;
+      const isCurrentUser = user.id === currentUserId;
+      const isLoading = updatingIds.value.has(user.id);
+      if (isCurrentUser) {
+        return h("div", { class: "w-[64px]" }, "");
+      }
+
+      return h("div", { class: "flex items-center justify-center" }, [
+        h(Switch, {
+          checked: user.status === 1,
+          disabled: isLoading || isCurrentUser,
+          key: `switch-${user.id}`,
+          onChange: (val: boolean) => {
+            onStatusChange(user.id, val ? 1 : 0);
+          },
+        }),
+      ]);
     },
   },
   {

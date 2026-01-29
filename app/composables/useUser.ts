@@ -12,6 +12,7 @@ export const useUser = () => {
     phoneNumber: row.phone_number,
     address: row.address,
     role: row.role,
+    status: row.status,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   });
@@ -35,6 +36,21 @@ export const useUser = () => {
     } catch (error) {
       console.error("Error deleting user:", error);
       throw error;
+    }
+  };
+
+  const toggleStatus = async (user: any) => {
+    const newStatus = user.status === 1 ? 0 : 1;
+
+    try {
+      await $fetch(`/api/users/${user.id}`, {
+        method: "PATCH",
+        body: { status: newStatus },
+      });
+
+      user.status = newStatus;
+    } catch (err) {
+      console.error("Gagal update status:", err);
     }
   };
 

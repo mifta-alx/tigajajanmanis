@@ -26,6 +26,7 @@ export const useAuth = () => {
         email,
         password,
       });
+
       if (authError) {
         throw {
           title: "Authentication Failed",
@@ -34,6 +35,19 @@ export const useAuth = () => {
         };
       }
 
+      const status = data.user?.app_metadata?.status;
+      const role = data.user?.app_metadata?.role;
+
+      if (status === 0 && role !== "admin") {
+        await client.auth.signOut();
+        throw {
+          title: "Account Disabled",
+          description:
+            "Your account has been deactivated. Please contact the administrator.",
+        };
+      }
+
+      await client.auth.getSession();
       return { data, error: null };
     } catch (err: any) {
       const errorObj = err.title

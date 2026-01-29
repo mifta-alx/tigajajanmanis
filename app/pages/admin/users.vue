@@ -17,7 +17,9 @@ useSeoMeta({
 
 const user = useSupabaseUser();
 const isModalOpen = ref(false);
+const updatingIds = ref(new Set<string>());
 const selectedUser = ref<User | null>(null);
+const { success, error } = useToast();
 
 const selectedId = ref<string | null>(null);
 
@@ -44,10 +46,37 @@ const onSuccessMutation = () => {
   isModalOpen.value = false;
 };
 
+const handleStatusChange = async (userId: string, newStatus: number) => {
+  updatingIds.value.add(userId);
+  try {
+    await $fetch(`/api/users/${userId}`, {
+      method: "PATCH",
+      body: { status: newStatus },
+    });
+
+    const user = users.value?.find((u) => u.id === userId);
+    if (user) {
+      user.status = newStatus as 0 | 1;
+    }
+
+    success("User status changed");
+  } catch (err) {
+    console.log(err);
+    error("User status failed to changed");
+  } finally {
+    updatingIds.value.delete(userId);
+  }
+};
+
 const userColumns = computed(() => {
-  return getColumns((id: string) => {
-    selectedId.value = id;
-  }, user.value?.sub);
+  return getColumns(
+    (id: string) => {
+      selectedId.value = id;
+    },
+    handleStatusChange,
+    user.value?.sub,
+    updatingIds,
+  );
 });
 
 const onDeleteSuccess = () => {
