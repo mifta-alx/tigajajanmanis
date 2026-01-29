@@ -38,7 +38,7 @@ const handleLogin = async () => {
   if (errors.value.username || errors.value.password) return;
   isNavigating.value = true;
   try {
-    const { error } = await login(
+    const { data, error } = await login(
       formLogin.value.username,
       formLogin.value.password,
     );
@@ -54,7 +54,9 @@ const handleLogin = async () => {
     await new Promise((resolve) => setTimeout(resolve, 100));
     const client = useSupabaseClient();
     await client.auth.getSession();
-    await navigateTo("/admin/dashboard", {
+    const role = data.user.app_metadata.role;
+    const url = role !== "admin" ? "/products" : "/admin/dashboard";
+    await navigateTo(url, {
       replace: true,
       external: false,
     });

@@ -1,34 +1,39 @@
 import type { Role } from "~/types/role";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
-  const client = useSupabaseClient();
   const user = useSupabaseUser();
+  const currentUser = user.value;
+  const guestRoutes = ["/", "/login"];
 
-  const {
-    data: { session },
-  } = await client.auth.getSession();
-  const currentUser = session?.user || user.value;
-
-  const role = user.value?.app_metadata?.role as Role | undefined;
-  const status = user.value?.app_metadata?.status;
+  const role = currentUser?.app_metadata?.role as Role | undefined;
+  const status = currentUser?.app_metadata?.status;
 
   if (currentUser && status === 0 && role !== "admin") {
+    const client = useSupabaseClient();
     await client.auth.signOut();
     return navigateTo("/login?error=account_disabled");
   }
 
-  if (to.path === "/") {
-    if (currentUser) return navigateTo("/admin/dashboard");
-    return navigateTo("/login");
+  if (guestRoutes.includes(to.path)) {
+    if (currentUser) {
+      return role === "admin"
+        ? navigateTo("/admin/dashboard")
+        : navigateTo("/products");
+    }
+    if (to.path === "/") return navigateTo("/login");
   }
 
-  if (to.path.startsWith("/admin")) {
+  if (
+    to.path === "/admin" ||
+    to.path === "/admin/" ||
+    to.path.startsWith("/admin/")
+  ) {
     if (!currentUser || role !== "admin") {
       return navigateTo("/login");
     }
-  }
 
-  if (to.path === "/login" && currentUser) {
-    return navigateTo("/admin/dashboard");
+    if (to.path === "/admin" || to.path === "/admin/") {
+      return navigateTo("/admin/dashboard");
+    }
   }
 });

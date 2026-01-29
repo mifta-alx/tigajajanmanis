@@ -36,9 +36,8 @@ export const useAuth = () => {
       }
 
       const status = data.user?.app_metadata?.status;
-      const role = data.user?.app_metadata?.role;
 
-      if (status === 0 && role !== "admin") {
+      if (status === 0) {
         await client.auth.signOut();
         throw {
           title: "Account Disabled",
