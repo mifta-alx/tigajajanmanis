@@ -74,6 +74,7 @@ const userColumns = computed(() => {
       selectedId.value = id;
     },
     handleStatusChange,
+    openEditModal,
     user.value?.sub,
     updatingIds,
   );

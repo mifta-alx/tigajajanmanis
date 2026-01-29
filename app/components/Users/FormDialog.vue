@@ -8,7 +8,7 @@ const props = defineProps<{
   user?: User | null;
 }>();
 
-const { createUser } = useUser();
+const { createUser, updateUser } = useUser();
 const { success, error } = useToast();
 const showPassword = ref(false);
 const emit = defineEmits(["success", "cancel"]);
@@ -21,14 +21,16 @@ const loading = ref(false);
 const isEdit = computed(() => !!props.user);
 
 const formSchema = z.object({
-  username: z
-    .string()
-    .toLowerCase()
-    .trim()
-    .min(1, "Username is required")
-    .min(5, "Username must be at least 5 characters.")
-    .max(32, "Username must be at most 20 characters.")
-    .regex(/^\S+$/, "Username cannot contain spaces"),
+  username: isEdit.value
+    ? z.string()
+    : z
+        .string()
+        .toLowerCase()
+        .trim()
+        .min(1, "Username is required")
+        .min(5, "Username must be at least 5 characters.")
+        .max(32, "Username must be at most 20 characters.")
+        .regex(/^\S+$/, "Username cannot contain spaces"),
 
   fullName: z
     .string()
@@ -36,12 +38,14 @@ const formSchema = z.object({
     .min(3, "Full name must be at least 3 characters")
     .max(100, "Full name is too long"),
 
-  password: z
-    .string()
-    .min(1, "Password is required")
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number"),
+  password: isEdit.value
+    ? z.string()
+    : z
+        .string()
+        .min(1, "Password is required")
+        .min(8, "Password must be at least 8 characters")
+        .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+        .regex(/[0-9]/, "Password must contain at least one number"),
 
   phoneNumber: z
     .string()
@@ -71,20 +75,22 @@ const form = useForm({
   },
   onSubmit: async ({ value }) => {
     loading.value = true;
+    const actionText = isEdit.value ? "updated" : "created";
     try {
-      await createUser({
-        username: value.username,
-        fullName: value.fullName,
-        phoneNumber: value.phoneNumber,
-        address: value.address,
-        role: value.role,
-        password: value.password,
-      });
-
-      success("User has been created");
+      if (isEdit.value && props.user) {
+        await updateUser(props.user.id, {
+          fullName: value.fullName,
+          phoneNumber: value.phoneNumber,
+          address: value.address,
+          role: value.role as Role,
+        });
+      } else {
+        await createUser({ ...value, status: 1 });
+      }
+      success(`User ${actionText} successfully`);
       emit("success");
     } catch (err) {
-      error("User has not been created");
+      error(`Failed to ${actionText} user`);
     } finally {
       loading.value = false;
     }
@@ -123,7 +129,7 @@ function isInvalid(field: any) {
         </form.Field>
       </div>
 
-      <form.Field name="username">
+      <form.Field name="username" v-if="!isEdit">
         <template #default="{ field }">
           <Field :data-invalid="isInvalid(field)">
             <FieldLabel :for="field.name"> Username </FieldLabel>
@@ -145,7 +151,7 @@ function isInvalid(field: any) {
         </template>
       </form.Field>
 
-      <form.Field name="password">
+      <form.Field name="password" v-if="!isEdit">
         <template #default="{ field }">
           <Field :data-invalid="isInvalid(field)">
             <FieldLabel :for="field.name"> Password </FieldLabel>
@@ -190,7 +196,7 @@ function isInvalid(field: any) {
               :name="field.name"
               :model-value="field.state.value"
               :aria-invalid="isInvalid(field)"
-              placeholder="08**********"
+              placeholder="08123456789"
               autocomplete=""
               @blur="field.handleBlur"
               @input="field.handleChange($event.target.value)"

@@ -17,6 +17,7 @@ import { AlertDialogTrigger } from "~/components/ui/alert-dialog";
 export const getColumns = (
   onDelete: (id: string) => void,
   onStatusChange: (id: string, newStatus: number) => void,
+  handleEditUser: (user: User) => void,
   currentUserId: string | undefined,
   updatingIds: Ref<Set<string>>,
 ): ColumnDef<User>[] => [
@@ -158,7 +159,7 @@ export const getColumns = (
                     h(
                       DropdownMenuItem,
                       {
-                        onClick: () => console.log("Edit user:", user.id),
+                        onClick: () => handleEditUser(user),
                       },
                       () => "Edit",
                     ),

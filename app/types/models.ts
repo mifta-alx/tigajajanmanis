@@ -12,6 +12,13 @@ export interface User {
   updatedAt: string;
 }
 
+export interface UpdateProfilePayload {
+  fullname?: string;
+  phone_number?: string;
+  address?: string | null;
+  role?: Role;
+}
+
 export interface AuthErrorResponse {
   title: string;
   description: string;

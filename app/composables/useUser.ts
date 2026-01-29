@@ -1,6 +1,7 @@
 import type { UserRow } from "~/types/database";
-import type { User } from "~/types/models";
+import type { UpdateProfilePayload, User } from "~/types/models";
 import type { Database } from "~/types/database.types";
+import type { Role } from "~/types/role";
 
 export const useUser = () => {
   const supabase = useSupabaseClient<Database>();
@@ -26,6 +27,20 @@ export const useUser = () => {
       method: "POST",
       body: payload,
     });
+  };
+
+  const updateUser = async (id: string, payload: Partial<User>) => {
+    const dbPayload: UpdateProfilePayload = {
+      fullname: payload.fullName,
+      phone_number: payload.phoneNumber,
+      address: payload.address ?? null,
+      role: payload.role as Role,
+    };
+    const { error } = await (supabase.from("profiles") as any)
+      .update(dbPayload)
+      .eq("id", id);
+
+    if (error) throw error;
   };
 
   const deleteUser = async (id: string) => {
@@ -73,5 +88,5 @@ export const useUser = () => {
     return data ? transformUser(data) : null;
   };
 
-  return { fetchAllUsers, fetchProfile, createUser, deleteUser };
+  return { fetchAllUsers, fetchProfile, createUser, updateUser, deleteUser };
 };
