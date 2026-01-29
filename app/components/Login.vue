@@ -4,6 +4,7 @@ import type { AuthErrorResponse } from "~/types/models";
 const { login, loading } = useAuth();
 const showAlert = ref(false);
 const showPassword = ref(false);
+const isNavigating = ref(false);
 const errorMessage = ref<AuthErrorResponse>({
   title: "",
   description: "",
@@ -49,6 +50,7 @@ const handleLogin = async () => {
       showAlert.value = false;
     }, 5000);
   } else {
+    isNavigating.value = true;
     const client = useSupabaseClient();
     await client.auth.getSession();
     await navigateTo("/admin/dashboard", {
@@ -57,6 +59,8 @@ const handleLogin = async () => {
     });
   }
 };
+
+const isProcessing = computed(() => loading.value || isNavigating.value);
 </script>
 
 <template>
@@ -123,8 +127,8 @@ const handleLogin = async () => {
         <FieldError v-if="errors.password" :errors="[errors.password]" />
       </Field>
       <Field>
-        <Button type="submit" :disabled="loading">
-          {{ loading ? "Memproses..." : "Login" }}
+        <Button type="submit" :disabled="isProcessing">
+          {{ isProcessing ? "Memproses..." : "Login" }}
         </Button>
       </Field>
       <Field>

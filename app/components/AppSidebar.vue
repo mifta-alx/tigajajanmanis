@@ -3,13 +3,13 @@ import NavFooter from "~/components/NavFooter.vue";
 
 const items = [
   {
-    title: 'Dashboard',
-    url: '/admin/dashboard',
-    icon: 'chart-pie',
+    title: "Dashboard",
+    url: "/admin/dashboard",
+    icon: "chart-pie",
   },
   {
     title: "Inventory",
-    icon: 'package-2',
+    icon: "package-2",
     items: [
       {
         title: "Merchant",
@@ -23,7 +23,7 @@ const items = [
   },
   {
     title: "Workflows",
-    icon: 'calculator',
+    icon: "calculator",
     items: [
       {
         title: "Stock In",
@@ -36,44 +36,42 @@ const items = [
     ],
   },
   {
-    title: 'Sales',
-    url: '#',
-    icon: 'circle-dollar-sign',
+    title: "Sales",
+    url: "#",
+    icon: "circle-dollar-sign",
   },
   {
-    title: 'Users',
-    url: '/admin/users',
-    icon: 'user-round',
+    title: "Users",
+    url: "/admin/users",
+    icon: "user-round",
   },
-]
-
+];
 </script>
 
-
 <template>
-      <Sidebar collapsible="offcanvas">
-        <SidebarHeader>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                  as-child
-                  class="data-[slot=sidebar-menu-button]:!p-1.5"
-              >
-                <a href="#">
-                  <Icon name="lucide:cookie" class="!size-5" />
-                  <span class="text-base font-semibold">TigaJajan.</span>
-                </a>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarHeader>
-        <SidebarContent>
-          <NavMain :items="items" />
-        </SidebarContent>
-        <SidebarFooter>
-          <NavFooter/>
-<!--          <ModeToggle/>-->
-        </SidebarFooter>
-        <SidebarRail />
-      </Sidebar>
+  <Sidebar collapsible="offcanvas">
+    <SidebarHeader>
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton
+            as-child
+            class="data-[slot=sidebar-menu-button]:!p-1.5"
+          >
+            <a href="#">
+              <Icon name="lucide:cookie" class="!size-5" />
+              <span class="text-base font-semibold">TigaJajan.</span>
+            </a>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    </SidebarHeader>
+    <SidebarContent>
+      <NavMain :items="items" />
+    </SidebarContent>
+    <SidebarFooter>
+      <NavFooter />
+      <!--      <ModeToggle />-->
+    </SidebarFooter>
+    <SidebarRail />
+  </Sidebar>
 </template>
