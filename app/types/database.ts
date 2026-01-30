@@ -11,3 +11,15 @@ export interface UserRow {
   created_at: string;
   updated_at: string;
 }
+
+export interface MerchantRow {
+  id: string;
+  name: string;
+  phone_number: string;
+  address: string | null;
+  logo_url: string | null;
+  is_active: boolean;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}

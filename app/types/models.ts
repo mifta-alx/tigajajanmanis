@@ -24,6 +24,26 @@ export interface AuthErrorResponse {
   description: string;
 }
 
+export interface Merchant {
+  id: string;
+  name: string;
+  phoneNumber: string;
+  address: string | null;
+  logoUrl: string | null;
+  isActive: boolean;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MerchantFormValues {
+  name: string;
+  phoneNumber: string;
+  address: string;
+  logoUrl: string;
+  logoFile: File | undefined;
+}
+
 export interface Toast {
   id: number;
   title: string;

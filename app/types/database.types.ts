@@ -9,27 +9,39 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
-      vendors: {
+      merchants: {
         Row: {
           id: string;
           name: string;
-          phone_number: string | null;
+          phone_number: string;
           address: string | null;
+          logo_url: string | null;
+          is_active: boolean;
+          created_by: string;
           created_at: string;
+          updated_at: string;
         };
         Insert: {
           id?: string;
           name: string;
-          phone_number?: string | null;
+          phone_number: string;
           address?: string | null;
+          logo_url?: string | null;
+          is_active?: boolean;
+          created_by: string;
           created_at?: string;
+          updated_at?: string;
         };
         Update: {
           id?: string;
           name?: string;
-          phone_number?: string | null;
+          phone_number?: string;
           address?: string | null;
+          logo_url?: string | null;
+          is_active?: boolean;
+          created_by?: string;
           created_at?: string;
+          updated_at?: string;
         };
       };
       products: {
