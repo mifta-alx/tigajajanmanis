@@ -1,32 +1,12 @@
 <script setup lang="ts">
-const props = defineProps<{ userId: string | null }>();
-const emit = defineEmits(["success", "cancel"]);
+const props = defineProps<{
+  name: string | null;
+  isDeleting: boolean;
+}>();
 
-const { deleteUser } = useUser();
-const { error, success } = useToast();
-const isDeleting = ref(false);
-
+const emit = defineEmits(["cancel", "confirm"]);
 const confirmDelete = async () => {
-  if (!props.userId) return;
-
-  const currentUser = useSupabaseUser();
-
-  if (props.userId === currentUser.value?.sub) {
-    error("You cannot delete your own account!");
-    return;
-  }
-
-  isDeleting.value = true;
-  try {
-    await deleteUser(props.userId);
-    success("User deleted successfully");
-
-    emit("success");
-  } catch (e) {
-    error("Failed to delete user");
-  } finally {
-    isDeleting.value = false;
-  }
+  emit("confirm");
 };
 </script>
 
@@ -35,7 +15,8 @@ const confirmDelete = async () => {
     <AlertDialogHeader>
       <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
       <AlertDialogDescription>
-        This action cannot be undone. This will permanently delete tha account
+        This action cannot be undone. This will permanently delete that
+        {{ props.name }}
         and remove the data from the servers.
       </AlertDialogDescription>
     </AlertDialogHeader>

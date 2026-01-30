@@ -17,7 +17,7 @@ import { AlertDialogTrigger } from "~/components/ui/alert-dialog";
 export const getColumns = (
   onDelete: (id: string) => void,
   onStatusChange: (id: string, newStatus: number) => void,
-  handleEditUser: (user: User) => void,
+  onEdit: (user: User) => void,
   currentUserId: string | undefined,
   updatingIds: Ref<Set<string>>,
 ): ColumnDef<User>[] => [
@@ -34,22 +34,6 @@ export const getColumns = (
     cell: ({ row }) => h("div", { class: "" }, row.getValue("username")),
   },
   {
-    accessorKey: "role",
-    header: () => h("div", { class: "text-center" }, "Role"),
-    size: 80,
-    cell: ({ row }) => {
-      const roleValue = row.getValue("role") as string;
-
-      return h("div", { class: "flex items-center justify-center gap-1" }, [
-        h(
-          Badge,
-          { variant: "secondary", class: "capitalize" },
-          { default: () => roleValue },
-        ),
-      ]);
-    },
-  },
-  {
     accessorKey: "fullName",
     size: 150,
     header: () => h("div", { class: "text-left" }, "Full name"),
@@ -63,6 +47,22 @@ export const getColumns = (
       const val = row.getValue("address") as string;
       const address = val && val.trim() !== "" ? val : "-";
       return h("div", { class: "text-wrap" }, address);
+    },
+  },
+  {
+    accessorKey: "role",
+    header: () => h("div", { class: "text-center" }, "Role"),
+    size: 80,
+    cell: ({ row }) => {
+      const roleValue = row.getValue("role") as string;
+
+      return h("div", { class: "flex items-center justify-center gap-1" }, [
+        h(
+          Badge,
+          { variant: "secondary", class: "capitalize" },
+          { default: () => roleValue },
+        ),
+      ]);
     },
   },
   {
@@ -159,7 +159,7 @@ export const getColumns = (
                     h(
                       DropdownMenuItem,
                       {
-                        onClick: () => handleEditUser(user),
+                        onClick: () => onEdit(user),
                       },
                       () => "Edit",
                     ),

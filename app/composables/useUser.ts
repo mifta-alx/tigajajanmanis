@@ -54,18 +54,14 @@ export const useUser = () => {
     }
   };
 
-  const toggleStatus = async (user: any) => {
-    const newStatus = user.status === 1 ? 0 : 1;
-
+  const toggleStatus = async (userId: string, newStatus: number) => {
     try {
-      await $fetch(`/api/users/${user.id}`, {
+      await $fetch(`/api/users/${userId}`, {
         method: "PATCH",
         body: { status: newStatus },
       });
-
-      user.status = newStatus;
     } catch (err) {
-      console.error("Gagal update status:", err);
+      throw err;
     }
   };
 
@@ -88,5 +84,12 @@ export const useUser = () => {
     return data ? transformUser(data) : null;
   };
 
-  return { fetchAllUsers, fetchProfile, createUser, updateUser, deleteUser };
+  return {
+    fetchAllUsers,
+    fetchProfile,
+    toggleStatus,
+    createUser,
+    updateUser,
+    deleteUser,
+  };
 };
