@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { getColumns } from "~/components/Users/column";
-import type { User } from "~/types/models";
 import EmptyView from "~/components/EmptyView.vue";
+import { refDebounced } from "@vueuse/core";
+import type { User } from "~/types/profiles";
 
 definePageMeta({
   layout: "admin",
@@ -9,8 +10,8 @@ definePageMeta({
 });
 
 useSeoMeta({
-  title: "Admin | Users",
-  ogTitle: "Admin | Users",
+  title: "TigaJajan POS | Users",
+  ogTitle: "TigaJajan POS | Users",
   description: "",
   ogDescription: "",
 });
@@ -23,13 +24,46 @@ const { success, error } = useToast();
 
 const selectedId = ref<string | null>(null);
 const isDeleting = ref(false);
-const { fetchAllUsers, toggleStatus, deleteUser } = useUser();
+
+const { fetchUsers, toggleStatus, deleteUser } = useUser();
+
+const searchQuery = ref("");
+const { currentPage, perPage, totalPages, paginationRange, resetPage } =
+  usePagination(
+    computed(() => users.value?.total ?? 0),
+    10,
+  );
+const debouncedSearch = refDebounced(searchQuery, 500);
+watch(debouncedSearch, () => resetPage());
 
 const {
   data: users,
   pending,
   refresh,
-} = useLazyAsyncData("users", () => fetchAllUsers());
+} = useLazyAsyncData(
+  "users",
+  () =>
+    fetchUsers({
+      search: debouncedSearch.value,
+      page: currentPage.value,
+      limit: perPage.value,
+    }),
+  {
+    watch: [debouncedSearch, currentPage, perPage],
+  },
+);
+
+const hasInitialData = ref(false);
+
+watch(
+  users,
+  (newVal) => {
+    if (newVal && newVal.total > 0) {
+      hasInitialData.value = true;
+    }
+  },
+  { immediate: true },
+);
 
 const openAddModal = () => {
   selectedUser.value = null;
@@ -51,7 +85,7 @@ const handleStatusChange = async (userId: string, newStatus: number) => {
   try {
     await toggleStatus(userId, newStatus);
 
-    const targetUser = users.value?.find((u) => u.id === userId);
+    const targetUser = users.value?.data.find((u) => u.id === userId);
     if (targetUser) {
       targetUser.status = newStatus as 0 | 1;
     }
@@ -110,7 +144,9 @@ const confirmDeleteUser = async () => {
 <template>
   <div class="min-h-0 h-full">
     <EmptyView
-      v-if="!pending && users?.length === 0"
+      v-if="
+        !pending && users?.total === 0 && !hasInitialData && !debouncedSearch
+      "
       icon="users-round"
       name="user"
       :on-create="openAddModal"
@@ -119,9 +155,26 @@ const confirmDeleteUser = async () => {
       <div class="flex flex-row gap-4 items-center justify-between">
         <div class="w-full md:max-w-sm">
           <InputGroup>
-            <InputGroupInput placeholder="Search user..." />
+            <InputGroupInput
+              v-model="searchQuery"
+              placeholder="Search user..."
+              @input="currentPage = 1"
+            />
             <InputGroupAddon>
-              <Icon name="lucide:search" />
+              <Spinner v-if="pending && searchQuery" class="size-3.5" />
+              <Icon v-else name="lucide:search" />
+            </InputGroupAddon>
+            <InputGroupAddon align="inline-end" v-if="searchQuery">
+              <InputGroupButton
+                type="button"
+                variant="ghost"
+                aria-label="Clear"
+                title="Clear"
+                size="icon-xs"
+                @click="searchQuery = ''"
+              >
+                <Icon name="lucide:x" />
+              </InputGroupButton>
             </InputGroupAddon>
           </InputGroup>
         </div>
@@ -130,22 +183,29 @@ const confirmDeleteUser = async () => {
           <span class="hidden lg:inline">Add User</span></Button
         >
       </div>
-      <AlertDialog
+      <DataTable
+        :columns="userColumns"
+        :data="users?.data ?? []"
+        :loading="pending"
+      />
+      <CustomPagination
+        v-if="(users?.total && users.total > 0) || pending"
+        :current-page="currentPage"
+        :total-pages="totalPages"
+        :per-page="perPage"
+        :pagination-range="paginationRange"
+        :pending="pending"
+        @update:page="(p) => (currentPage = p)"
+        @update:per-page="(s) => (perPage = s)"
+      />
+
+      <DeleteDialog
         :open="!!selectedId"
-        @update:open="(val) => (!val ? (selectedId = null) : null)"
-      >
-        <DataTable
-          :columns="userColumns"
-          :data="users ?? []"
-          :loading="pending"
-        />
-        <DeleteDialog
-          name="account"
-          :is-deleting="isDeleting"
-          @confirm="confirmDeleteUser"
-          @cancel="selectedId = null"
-        />
-      </AlertDialog>
+        name="account"
+        :is-deleting="isDeleting"
+        @confirm="confirmDeleteUser"
+        @cancel="selectedId = null"
+      />
     </div>
     <Dialog v-model:open="isModalOpen">
       <DialogContent class="sm:max-w-xl">

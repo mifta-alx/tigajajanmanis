@@ -1,25 +1,12 @@
-import type { UserRow } from "~/types/database";
-import type { UpdateProfilePayload, User } from "~/types/models";
-import type { Database } from "~/types/database.types";
+import type { Profile } from "~/types/models";
 import type { Role } from "~/types/role";
+import type { CreateProfileDTO, UpdateProfileDTO } from "~/types/profiles";
 
 export const useUser = () => {
-  const supabase = useSupabaseClient<Database>();
-
-  const transformUser = (row: UserRow): User => ({
-    id: row.id,
-    username: row.username,
-    fullName: row.fullname,
-    phoneNumber: row.phone_number,
-    address: row.address,
-    role: row.role,
-    status: row.status,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  });
+  const supabase = useSupabaseClient();
 
   const createUser = async (
-    payload: Omit<User, "id" | "createdAt" | "updatedAt"> & {
+    payload: CreateProfileDTO & {
       password: string;
     },
   ) => {
@@ -29,15 +16,15 @@ export const useUser = () => {
     });
   };
 
-  const updateUser = async (id: string, payload: Partial<User>) => {
-    const dbPayload: UpdateProfilePayload = {
-      fullname: payload.fullName,
-      phone_number: payload.phoneNumber,
+  const updateUser = async (id: string, payload: UpdateProfileDTO) => {
+    const updateData: UpdateProfileDTO = {
+      fullname: payload.fullname,
+      phone_number: payload.phone_number,
       address: payload.address ?? null,
       role: payload.role as Role,
     };
     const { error } = await (supabase.from("profiles") as any)
-      .update(dbPayload)
+      .update(updateData)
       .eq("id", id);
 
     if (error) throw error;
@@ -65,28 +52,43 @@ export const useUser = () => {
     }
   };
 
-  const fetchAllUsers = async () => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .order("created_at", { ascending: true });
-    if (error) throw error;
-    return data ? data.map(transformUser) : [];
-  };
+  const fetchUsers = async (params: {
+    search?: string;
+    page: number;
+    limit: number;
+  }): Promise<{
+    data: Omit<Profile, "created_at" | "updated_at">[];
+    total: number;
+  }> => {
+    const { search, page, limit } = params;
 
-  const fetchProfile = async (id: string) => {
-    const { data, error } = await supabase
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    let query = supabase
       .from("profiles")
-      .select("*")
-      .eq("id", id)
-      .single();
-    if (error) return null;
-    return data ? transformUser(data) : null;
+      .select("id, username, fullname, phone_number, address, role, status", {
+        count: "exact",
+      });
+
+    if (search) {
+      query = query.or(`fullname.ilike.%${search}%,username.ilike.%${search}%`);
+    }
+
+    const { data, error, count } = await query
+      .order("created_at", { ascending: true })
+      .range(from, to);
+
+    if (error) throw error;
+
+    return {
+      data,
+      total: count || 0,
+    };
   };
 
   return {
-    fetchAllUsers,
-    fetchProfile,
+    fetchUsers,
     toggleStatus,
     createUser,
     updateUser,

@@ -1,7 +1,7 @@
-import type { User } from "~/types/models";
 import { z } from "zod";
 import type { Role } from "~/types/role";
 import { useForm } from "@tanstack/vue-form";
+import type { User } from "~/types/profiles";
 
 export const useFormUser = (props: {
   user?: User | null;
@@ -24,7 +24,7 @@ export const useFormUser = (props: {
           .max(32, "Username must be at most 20 characters.")
           .regex(/^\S+$/, "Username cannot contain spaces"),
 
-    fullName: z
+    fullname: z
       .string()
       .min(1, "Full name is required")
       .min(3, "Full name must be at least 3 characters")
@@ -39,7 +39,7 @@ export const useFormUser = (props: {
           .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
           .regex(/[0-9]/, "Password must contain at least one number"),
 
-    phoneNumber: z
+    phone_number: z
       .string()
       .min(1, "Phone number is required")
       .min(10, "Phone number must be at least 10 digits")
@@ -56,9 +56,9 @@ export const useFormUser = (props: {
   const form = useForm({
     defaultValues: {
       username: props.user?.username ?? "",
-      fullName: props.user?.fullName ?? "",
+      fullname: props.user?.fullname ?? "",
       password: "",
-      phoneNumber: props.user?.phoneNumber ?? "",
+      phone_number: props.user?.phone_number ?? "",
       address: props.user?.address ?? "",
       role: (props.user?.role as Role) ?? ("" as Role),
     },
@@ -71,18 +71,15 @@ export const useFormUser = (props: {
       try {
         if (props.user) {
           await updateUser(props.user.id, {
-            fullName: value.fullName,
-            phoneNumber: value.phoneNumber,
-            address: value.address,
-            role: value.role as Role,
+            ...value,
           });
         } else {
-          await createUser({ ...value, status: 1 });
+          await createUser(value);
         }
         success(`User ${actionText} successfully`);
         props.onSuccess();
-      } catch (err) {
-        error(`Failed to ${actionText} user`);
+      } catch (err: any) {
+        error(err.statusMessage ?? `Failed to ${actionText} user`);
       } finally {
         loading.value = false;
       }

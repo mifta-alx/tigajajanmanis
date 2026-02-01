@@ -1,6 +1,5 @@
 import { h } from "vue";
 import type { ColumnDef } from "@tanstack/vue-table";
-import type { User } from "~/types/models";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import Switch from "~/components/Switch.vue";
@@ -12,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { Icon } from "@iconify/vue";
-import { AlertDialogTrigger } from "~/components/ui/alert-dialog";
+import type { User } from "~/types/profiles";
 
 export const getColumns = (
   onDelete: (id: string) => void,
@@ -24,7 +23,7 @@ export const getColumns = (
   {
     accessorKey: "number",
     header: () => h("div", { class: "text-center" }, "No"),
-    size: 64,
+    size: 100,
     cell: ({ row }) => h("div", { class: "text-center" }, row.index + 1),
   },
   {
@@ -34,14 +33,15 @@ export const getColumns = (
     cell: ({ row }) => h("div", { class: "" }, row.getValue("username")),
   },
   {
-    accessorKey: "fullName",
-    size: 150,
+    accessorKey: "fullname",
+    size: 240,
     header: () => h("div", { class: "text-left" }, "Full name"),
     cell: ({ row }) =>
-      h("div", { class: "capitalize" }, row.getValue("fullName")),
+      h("div", { class: "capitalize" }, row.getValue("fullname")),
   },
   {
     accessorKey: "address",
+    size: 280,
     header: () => h("div", { class: "text-left" }, "Address"),
     cell: ({ row }) => {
       const val = row.getValue("address") as string;
@@ -95,7 +95,7 @@ export const getColumns = (
     cell: ({ row }) => {
       const user = row.original;
       const isCurrentUser = user.id === currentUserId;
-      const phoneNumber = user.phoneNumber;
+      const phoneNumber = user.phone_number;
 
       if (isCurrentUser) {
         return h("div", { class: "w-[100px]" }, "");
@@ -165,17 +165,9 @@ export const getColumns = (
                     ),
                     h(DropdownMenuSeparator, {}),
                     h(
-                      AlertDialogTrigger,
-                      { asChild: true },
-                      {
-                        default: () => [
-                          h(
-                            DropdownMenuItem,
-                            { onClick: () => onDelete(user.id) },
-                            () => "Delete",
-                          ),
-                        ],
-                      },
+                      DropdownMenuItem,
+                      { onClick: () => onDelete(user.id) },
+                      () => "Delete",
                     ),
                   ],
                 },

@@ -1,47 +1,32 @@
 import type { Role } from "~/types/role";
 
-export interface User {
+export interface Profile {
   id: string;
   username: string;
-  fullName: string;
-  phoneNumber: string;
+  fullname: string;
+  phone_number: string;
   address: string | null;
   role: Role;
   status: 0 | 1;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface UpdateProfilePayload {
-  fullname?: string;
-  phone_number?: string;
-  address?: string | null;
-  role?: Role;
-}
-
-export interface AuthErrorResponse {
-  title: string;
-  description: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Merchant {
   id: string;
   name: string;
-  phoneNumber: string;
+  phone_number: string;
   address: string | null;
-  logoUrl: string | null;
-  isActive: boolean;
-  createdBy: string;
-  createdAt: string;
-  updatedAt: string;
+  logo_url: string | null;
+  is_active: boolean;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
 }
 
-export interface MerchantFormValues {
-  name: string;
-  phoneNumber: string;
-  address: string;
-  logoUrl: string;
-  logoFile: File | undefined;
+export interface AuthErrorResponse {
+  title: string;
+  description: string;
 }
 
 export interface Toast {

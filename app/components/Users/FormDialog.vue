@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { User } from "~/types/models";
 import type { Role } from "~/types/role";
 import { isInvalid } from "~/lib/utils";
+import type { User } from "~/types/profiles";
 
 const props = defineProps<{
   user?: User | null;
@@ -25,7 +25,7 @@ const { form, loading } = useFormUser({
   <form @submit.prevent="form.handleSubmit" class="space-y-4">
     <FieldGroup class="grid sm:grid-cols-2 gap-4">
       <div class="sm:col-span-2">
-        <form.Field name="fullName">
+        <form.Field name="fullname">
           <template #default="{ field }">
             <Field :data-invalid="isInvalid(field)">
               <FieldLabel for="field.name">
@@ -98,8 +98,8 @@ const { form, loading } = useFormUser({
               <InputGroupAddon align="inline-end">
                 <InputGroupButton
                   type="button"
-                  aria-label="Copy"
-                  title="Copy"
+                  aria-label="ShowPassword"
+                  title="ShowPassword"
                   size="icon-xs"
                   @click="handleShowPassword"
                 >
@@ -115,7 +115,7 @@ const { form, loading } = useFormUser({
         </template>
       </form.Field>
 
-      <form.Field name="phoneNumber">
+      <form.Field name="phone_number">
         <template #default="{ field }">
           <Field :data-invalid="isInvalid(field)">
             <FieldLabel :for="field.name">

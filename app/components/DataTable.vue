@@ -51,7 +51,7 @@ const table = useVueTable({
       </TableHeader>
       <TableBody>
         <template v-if="props.loading">
-          <TableRow v-for="i in 5" :key="`skeleton-${i}`">
+          <TableRow v-for="i in 10" :key="`skeleton-${i}`">
             <TableCell
               v-for="j in columns.length"
               :key="`cell-${j}`"

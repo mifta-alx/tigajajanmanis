@@ -21,13 +21,25 @@ export default defineEventHandler(async (event) => {
     email_confirm: true,
     user_metadata: {
       username: body.username,
-      fullname: body.fullName,
-      phone_number: body.phoneNumber,
+      fullname: body.fullname,
+      phone_number: body.phone_number,
       address: body.address,
       role: body.role,
     },
   });
 
-  if (error) throw error;
+  if (error) {
+    if (error.status === 422) {
+      throw createError({
+        statusCode: error.status,
+        statusMessage: "Username has already been registered",
+      });
+    } else {
+      throw createError({
+        statusCode: error.status,
+        statusMessage: error.message,
+      });
+    }
+  }
   return data;
 });

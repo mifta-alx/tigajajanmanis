@@ -34,7 +34,6 @@ export default defineNuxtConfig({
     storageKey: "tigajajan-color-mode",
   },
   supabase: {
-    // types: './types/database.types.ts',
     redirect: false,
     cookieOptions: {
       maxAge: 60 * 60 * 8,
