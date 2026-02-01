@@ -1,23 +1,25 @@
-import type { Merchant } from "~/types/models";
+import type { MerchantWithProfile } from "~/types/merchant";
 import { useMerchant } from "~/composables/useMerchant";
 import { z } from "zod";
 import { useForm } from "@tanstack/vue-form";
 
 export const useFormMerchant = (props: {
-  merchant?: Merchant | null;
+  merchant?: MerchantWithProfile | null;
   onSuccess: () => void;
 }) => {
   const { uploadLogo, createMerchant, updateMerchant } = useMerchant();
   const { success, error } = useToast();
   const loading = ref(false);
+
   const logoFile = ref<File | null | undefined>(undefined);
+
   const formSchema = z.object({
     name: z
       .string()
       .min(1, "Name is required")
       .min(3, "Name must be at least 3 characters"),
 
-    phoneNumber: z
+    phone_number: z
       .string()
       .min(1, "Phone number is required")
       .min(10, "Phone number must be at least 10 digits")
@@ -25,17 +27,17 @@ export const useFormMerchant = (props: {
       .regex(/^[0-9]+$/, "Phone number must contain only numbers"),
 
     address: z.string(),
-    logoUrl: z.string(),
-    logoFile: z.any(),
+    logo_url: z.string(),
+    logo_file: z.any(),
   });
 
   const form = useForm({
     defaultValues: {
       name: props.merchant?.name ?? "",
-      phoneNumber: props.merchant?.phoneNumber ?? "",
+      phone_number: props.merchant?.phone_number ?? "",
       address: props.merchant?.address ?? "",
-      logoUrl: props.merchant?.logoUrl ?? "",
-      logoFile: undefined as File | null | undefined,
+      logo_url: props.merchant?.logo_url ?? "",
+      logo_file: undefined as File | null | undefined,
     },
     validators: {
       onSubmit: formSchema,
@@ -43,27 +45,30 @@ export const useFormMerchant = (props: {
     onSubmit: async ({ value }) => {
       loading.value = true;
 
-      const payload = {
-        name: value.name,
-        phoneNumber: value.phoneNumber,
-        address: value.address || "",
-        logoUrl: props.merchant?.logoUrl ?? null,
-      };
-
       const actionText = props.merchant ? "updated" : "created";
       try {
         if (props.merchant) {
-          await updateMerchant(props.merchant.id, payload, logoFile.value);
+          await updateMerchant(
+            props.merchant.id,
+            {
+              name: value.name,
+              phone_number: value.phone_number,
+              address: value.address,
+              logo_url: props.merchant?.logo_url,
+            },
+            logoFile.value,
+          );
         } else {
           let logoUrl: string | null = null;
+
           if (logoFile.value instanceof File) {
             logoUrl = await uploadLogo(logoFile.value);
           }
           await createMerchant({
-            name: payload.name,
-            phoneNumber: payload.phoneNumber,
-            address: payload.address,
-            logoUrl,
+            name: value.name,
+            phone_number: value.phone_number,
+            address: value.address,
+            logo_url: logoUrl,
           });
         }
         success(`Merchant ${actionText} successfully`);

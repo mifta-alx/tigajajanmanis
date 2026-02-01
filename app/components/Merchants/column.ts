@@ -1,6 +1,6 @@
 import { h } from "vue";
 import type { ColumnDef } from "@tanstack/vue-table";
-import type { Merchant } from "~/types/models";
+import type { MerchantWithProfile } from "~/types/merchant";
 import { Button } from "~/components/ui/button";
 import Switch from "~/components/Switch.vue";
 import {
@@ -11,15 +11,14 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { Icon } from "@iconify/vue";
-import { AlertDialogTrigger } from "~/components/ui/alert-dialog";
 import { NuxtImg } from "#components";
 
 export const getColumns = (
   onDelete: (id: string) => void,
   onStatusChange: (id: string, newStatus: boolean) => void,
-  onEdit: (merchant: Merchant) => void,
+  onEdit: (merchant: MerchantWithProfile) => void,
   updatingIds: Ref<Set<string>>,
-): ColumnDef<Merchant>[] => [
+): ColumnDef<MerchantWithProfile>[] => [
   {
     accessorKey: "number",
     header: () => h("div", { class: "text-center" }, "No"),
@@ -33,12 +32,12 @@ export const getColumns = (
     cell: ({ row }) => {
       const merchant = row.original;
       const imageSrc =
-        merchant.logoUrl && merchant.logoUrl !== ""
-          ? merchant.logoUrl
+        merchant.logo_url && merchant.logo_url !== ""
+          ? merchant.logo_url
           : "https://placehold.co/32x32?text=M";
       return h("div", { class: "flex items-center gap-2" }, [
         h(NuxtImg as any, {
-          class: "size-8 rounded-sm",
+          class: "size-8 rounded-sm object-cover",
           src: imageSrc,
           alt: merchant.name,
         }),
@@ -66,7 +65,7 @@ export const getColumns = (
 
       return h("div", { class: "flex items-center justify-center" }, [
         h(Switch, {
-          checked: merchant.isActive,
+          checked: merchant.is_active,
           disabled: isLoading,
           key: `switch-${merchant.id}`,
           onChange: (val: boolean) => {
@@ -77,11 +76,17 @@ export const getColumns = (
     },
   },
   {
+    accessorKey: "creator_name",
+    size: 200,
+    header: () => h("div", { class: "text-left" }, "Created by"),
+    cell: ({ row }) => h("div", { class: "" }, row.getValue("creator_name")),
+  },
+  {
     id: "actions",
     size: 100,
     cell: ({ row }) => {
       const merchant = row.original;
-      const phoneNumber = merchant.phoneNumber;
+      const phoneNumber = merchant.phone_number;
 
       return h("div", { class: "flex items-center justify-end gap-2" }, [
         h(
@@ -147,17 +152,9 @@ export const getColumns = (
                     ),
                     h(DropdownMenuSeparator, {}),
                     h(
-                      AlertDialogTrigger,
-                      { asChild: true },
-                      {
-                        default: () => [
-                          h(
-                            DropdownMenuItem,
-                            { onClick: () => onDelete(merchant.id) },
-                            () => "Delete",
-                          ),
-                        ],
-                      },
+                      DropdownMenuItem,
+                      { onClick: () => onDelete(merchant.id) },
+                      () => "Delete",
                     ),
                   ],
                 },

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { Merchant } from "~/types/models";
+import type { MerchantWithProfile } from "~/types/merchant";
 import { isInvalid } from "~/lib/utils";
 
 const props = defineProps<{
-  merchant?: Merchant | null;
+  merchant?: MerchantWithProfile | null;
 }>();
 
 const emit = defineEmits(["success", "cancel"]);
@@ -17,11 +17,11 @@ const { form, loading, logoFile } = useFormMerchant({
 <template>
   <form @submit.prevent="form.handleSubmit" class="space-y-4">
     <FieldGroup class="grid sm:grid-cols-4 gap-4">
-      <form.Field name="logoFile">
+      <form.Field name="logo_file">
         <template #default="{ field }">
           <ImageUpload
             label="Logo"
-            :model-value="props.merchant?.logoUrl"
+            :model-value="props.merchant?.logo_url"
             @change="
               (file) => {
                 logoFile = file;
@@ -56,7 +56,7 @@ const { form, loading, logoFile } = useFormMerchant({
           </template>
         </form.Field>
 
-        <form.Field name="phoneNumber">
+        <form.Field name="phone_number">
           <template #default="{ field }">
             <Field :data-invalid="isInvalid(field)">
               <FieldLabel :for="field.name">

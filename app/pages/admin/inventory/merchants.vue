@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import type { Merchant } from "~/types/models";
+import type { MerchantWithProfile } from "~/types/merchant";
 import { getColumns } from "~/components/Merchants/column";
 import DeleteDialog from "~/components/DeleteDialog.vue";
 import EmptyView from "~/components/EmptyView.vue";
+import { refDebounced } from "@vueuse/core";
 
 definePageMeta({
   layout: "admin",
@@ -10,33 +11,66 @@ definePageMeta({
 });
 
 useSeoMeta({
-  title: "Admin | Inventory > Merchants",
-  ogTitle: "Admin | Inventory > Merchants",
+  title: "TigaJajan POS | Inventory > Merchants",
+  ogTitle: "TigaJajan POS | Inventory > Merchants",
   description: "",
   ogDescription: "",
 });
 
 const isModalOpen = ref(false);
 const updatingIds = ref(new Set<string>());
-const selectedMerchant = ref<Merchant | null>(null);
+const selectedMerchant = ref<MerchantWithProfile | null>(null);
 const { success, error } = useToast();
+
 const selectedId = ref<string | null>(null);
 const isDeleting = ref(false);
 
 const { fetchMerchants, deleteMerchant, toggleStatus } = useMerchant();
 
+const searchQuery = ref("");
+const { currentPage, perPage, totalPages, paginationRange, resetPage } =
+  usePagination(
+    computed(() => merchants.value?.total ?? 0),
+    10,
+  );
+const debouncedSearch = refDebounced(searchQuery, 500);
+watch(debouncedSearch, () => resetPage());
+
 const {
   data: merchants,
   pending,
   refresh,
-} = useLazyAsyncData("merchants", () => fetchMerchants());
+} = useLazyAsyncData(
+  "merchants",
+  () =>
+    fetchMerchants({
+      search: debouncedSearch.value,
+      page: currentPage.value,
+      limit: perPage.value,
+    }),
+  {
+    watch: [debouncedSearch, currentPage, perPage],
+  },
+);
+
+const hasInitialData = ref(false);
+
+watch(
+  merchants,
+  (newVal) => {
+    if (newVal && newVal.total > 0) {
+      hasInitialData.value = true;
+    }
+  },
+  { immediate: true },
+);
 
 const openAddModal = () => {
   selectedMerchant.value = null;
   isModalOpen.value = true;
 };
 
-const openEditModal = (merchant: Merchant) => {
+const openEditModal = (merchant: MerchantWithProfile) => {
   selectedMerchant.value = merchant;
   isModalOpen.value = true;
 };
@@ -51,9 +85,11 @@ const handleStatusChange = async (merchantId: string, newStatus: boolean) => {
   try {
     await toggleStatus(merchantId, newStatus);
 
-    const targetMerchant = merchants.value?.find((u) => u.id === merchantId);
+    const targetMerchant = merchants.value?.data.find(
+      (u) => u.id === merchantId,
+    );
     if (targetMerchant) {
-      targetMerchant.isActive = newStatus;
+      targetMerchant.is_active = newStatus;
     }
 
     const status = newStatus ? "activated" : "deactivated";
@@ -102,7 +138,12 @@ const confirmDeleteMerchant = async () => {
 <template>
   <div class="min-h-0 h-full">
     <EmptyView
-      v-if="!pending && merchants?.length === 0"
+      v-if="
+        !pending &&
+        merchants?.total === 0 &&
+        !hasInitialData &&
+        !debouncedSearch
+      "
       icon="store"
       name="merchant"
       :on-create="openAddModal"
@@ -111,9 +152,26 @@ const confirmDeleteMerchant = async () => {
       <div class="flex flex-row gap-4 items-center justify-between">
         <div class="w-full md:max-w-sm">
           <InputGroup>
-            <InputGroupInput placeholder="Search merchant..." />
+            <InputGroupInput
+              v-model="searchQuery"
+              placeholder="Search merchant..."
+              @input="currentPage = 1"
+            />
             <InputGroupAddon>
-              <Icon name="lucide:search" />
+              <Spinner v-if="pending && searchQuery" class="size-3.5" />
+              <Icon v-else name="lucide:search" />
+            </InputGroupAddon>
+            <InputGroupAddon align="inline-end" v-if="searchQuery">
+              <InputGroupButton
+                type="button"
+                variant="ghost"
+                aria-label="Clear"
+                title="Clear"
+                size="icon-xs"
+                @click="searchQuery = ''"
+              >
+                <Icon name="lucide:x" />
+              </InputGroupButton>
             </InputGroupAddon>
           </InputGroup>
         </div>
@@ -122,22 +180,29 @@ const confirmDeleteMerchant = async () => {
           <span class="hidden lg:inline">Add Merchant</span></Button
         >
       </div>
-      <AlertDialog
+      <DataTable
+        :columns="merchantColumns"
+        :data="merchants?.data ?? []"
+        :loading="pending"
+      />
+      <CustomPagination
+        v-if="(merchants?.total && merchants.total > 0) || pending"
+        :current-page="currentPage"
+        :total-pages="totalPages"
+        :per-page="perPage"
+        :pagination-range="paginationRange"
+        :pending="pending"
+        @update:page="(p) => (currentPage = p)"
+        @update:per-page="(s) => (perPage = s)"
+      />
+
+      <DeleteDialog
         :open="!!selectedId"
-        @update:open="(val) => (!val ? (selectedId = null) : null)"
-      >
-        <DataTable
-          :columns="merchantColumns"
-          :data="merchants ?? []"
-          :loading="pending"
-        />
-        <DeleteDialog
-          name="merchant"
-          :is-deleting="isDeleting"
-          @confirm="confirmDeleteMerchant"
-          @cancel="selectedId = null"
-        />
-      </AlertDialog>
+        name="merchant"
+        :is-deleting="isDeleting"
+        @confirm="confirmDeleteMerchant"
+        @cancel="selectedId = null"
+      />
     </div>
     <Dialog v-model:open="isModalOpen">
       <DialogContent
