@@ -54,13 +54,14 @@ watch(
     <Label v-if="label">{{ label }}</Label>
 
     <div class="relative group w-full">
+      <div tabindex="0" class="sr-only" autofocus />
       <div
         v-if="displayImage"
         class="relative h-[120px] w-full overflow-hidden rounded-md border border-input"
         @mouseenter="isHovered = true"
         @mouseleave="isHovered = false"
       >
-        <img
+        <NuxtImg
           :src="displayImage"
           class="h-full w-full object-cover"
           alt="Preview"
@@ -83,9 +84,11 @@ watch(
 
       <div
         v-else
+        tabindex="0"
         class="flex flex-col items-center justify-center h-[120px] w-full border rounded-md transition-all duration-300 bg-input/30 hover:bg-input/60"
         :class="[error ? 'border-destructive' : 'border-input']"
         @click="handleFilePickerClick"
+        @keydown.enter="handleFilePickerClick"
       >
         <div
           class="flex flex-col items-center justify-center space-y-3 text-muted-foreground"

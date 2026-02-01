@@ -1,15 +1,13 @@
-import type { Merchant } from "./models";
+import type { MerchantEntity } from "./models";
 
 export type CreateMerchantDTO = Omit<
-  Merchant,
-  "id" | "is_active" | "created_at" | "updated_at"
+  MerchantEntity,
+  "id" | "is_active" | "creator_name" | "created_at" | "updated_at"
 >;
 
 export type UpdateMerchantDTO = Partial<CreateMerchantDTO>;
 
-export interface MerchantWithProfile extends Omit<
-  Merchant,
+export type Merchant = Omit<
+  MerchantEntity,
   "created_by" | "created_at" | "updated_at"
-> {
-  creator_name: string;
-}
+>;

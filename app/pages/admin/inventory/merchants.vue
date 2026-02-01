@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MerchantWithProfile } from "~/types/merchant";
+import type { Merchant } from "~/types/merchant";
 import { getColumns } from "~/components/Merchants/column";
 import DeleteDialog from "~/components/DeleteDialog.vue";
 import EmptyView from "~/components/EmptyView.vue";
@@ -19,7 +19,7 @@ useSeoMeta({
 
 const isModalOpen = ref(false);
 const updatingIds = ref(new Set<string>());
-const selectedMerchant = ref<MerchantWithProfile | null>(null);
+const selectedMerchant = ref<Merchant | null>(null);
 const { success, error } = useToast();
 
 const selectedId = ref<string | null>(null);
@@ -70,7 +70,7 @@ const openAddModal = () => {
   isModalOpen.value = true;
 };
 
-const openEditModal = (merchant: MerchantWithProfile) => {
+const openEditModal = (merchant: Merchant) => {
   selectedMerchant.value = merchant;
   isModalOpen.value = true;
 };
@@ -205,10 +205,7 @@ const confirmDeleteMerchant = async () => {
       />
     </div>
     <Dialog v-model:open="isModalOpen">
-      <DialogContent
-        class="sm:max-w-xl"
-        @open-auto-focus="(e) => e.preventDefault()"
-      >
+      <DialogContent class="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>{{
             selectedMerchant ? "Edit Merchant" : "Add Merchant"

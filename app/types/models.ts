@@ -12,7 +12,7 @@ export interface Profile {
   updated_at: string;
 }
 
-export interface Merchant {
+export interface MerchantEntity {
   id: string;
   name: string;
   phone_number: string;
@@ -20,6 +20,23 @@ export interface Merchant {
   logo_url: string | null;
   is_active: boolean;
   created_by: string;
+  creator_name: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProductEntity {
+  id: string;
+  merchant_id: string;
+  name: string;
+  cost_price: number;
+  selling_price: number;
+  stock: number;
+  sku: string;
+  image_url: string | null;
+  is_active: boolean;
+  created_by: string;
+  creator_name: string;
   created_at: string;
   updated_at: string;
 }

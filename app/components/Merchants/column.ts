@@ -1,6 +1,6 @@
 import { h } from "vue";
 import type { ColumnDef } from "@tanstack/vue-table";
-import type { MerchantWithProfile } from "~/types/merchant";
+import type { Merchant } from "~/types/merchant";
 import { Button } from "~/components/ui/button";
 import Switch from "~/components/Switch.vue";
 import {
@@ -16,9 +16,9 @@ import { NuxtImg } from "#components";
 export const getColumns = (
   onDelete: (id: string) => void,
   onStatusChange: (id: string, newStatus: boolean) => void,
-  onEdit: (merchant: MerchantWithProfile) => void,
+  onEdit: (merchant: Merchant) => void,
   updatingIds: Ref<Set<string>>,
-): ColumnDef<MerchantWithProfile>[] => [
+): ColumnDef<Merchant>[] => [
   {
     accessorKey: "number",
     header: () => h("div", { class: "text-center" }, "No"),
@@ -28,7 +28,7 @@ export const getColumns = (
   {
     accessorKey: "name",
     size: 200,
-    header: () => h("div", { class: "text-left" }, "Merchant"),
+    header: () => h("div", { class: "text-left" }, "Merchant name"),
     cell: ({ row }) => {
       const merchant = row.original;
       const imageSrc =

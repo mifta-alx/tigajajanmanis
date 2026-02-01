@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { MerchantWithProfile } from "~/types/merchant";
+import type { Merchant } from "~/types/merchant";
 import { isInvalid } from "~/lib/utils";
 
 const props = defineProps<{
-  merchant?: MerchantWithProfile | null;
+  merchant?: Merchant | null;
 }>();
 
 const emit = defineEmits(["success", "cancel"]);
@@ -35,8 +35,9 @@ const { form, loading, logoFile } = useFormMerchant({
         <form.Field name="name">
           <template #default="{ field }">
             <Field :data-invalid="isInvalid(field)">
-              <FieldLabel for="field.name">
-                Name <span className="text-destructive">*</span></FieldLabel
+              <FieldLabel :for="field.name">
+                Merchant name
+                <span className="text-destructive">*</span></FieldLabel
               >
               <Input
                 :id="field.name"
@@ -106,11 +107,7 @@ const { form, loading, logoFile } = useFormMerchant({
         Cancel
       </Button>
       <Button type="submit" :disabled="loading">
-        <Icon
-          name="lucide:loader-2"
-          v-if="loading"
-          class="h-4 w-4 animate-spin"
-        />
+        <Spinner class="size-4" v-if="loading" />
         {{ loading ? "Saving..." : "Save" }}
       </Button>
     </Field>

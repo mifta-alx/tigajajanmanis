@@ -1,48 +1,23 @@
 import type {
   CreateMerchantDTO,
-  MerchantWithProfile,
+  Merchant,
   UpdateMerchantDTO,
 } from "~/types/merchant";
-import { convertToWebP } from "~/lib/utils";
-import type { Merchant } from "~/types/models";
+import type { MerchantEntity } from "~/types/models";
 
-interface MerchantResponse {
+interface SimpleMerchants {
   id: string;
   name: string;
-  phone_number: string;
-  address: string;
-  logo_url: string;
-  is_active: boolean;
-  profiles: { fullname: string } | null;
 }
 
 export const useMerchant = () => {
   const supabase = useSupabaseClient();
   const user = useSupabaseUser();
   const { deleteFile } = useStorage();
-
-  const uploadLogo = async (file: File) => {
-    const webpBlob = await convertToWebP(file);
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.webp`;
-
-    const { data, error: uploadError } = await supabase.storage
-      .from("merchants")
-      .upload(fileName, webpBlob, { contentType: "image/webp" });
-
-    if (uploadError) throw uploadError;
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("merchants").getPublicUrl(fileName);
-
-    return publicUrl;
-  };
+  const { uploadImage } = useUploadStorage();
 
   const createMerchant = async (
-    payload: Omit<
-      CreateMerchantDTO,
-      "id" | "created_at" | "updated_at" | "created_by" | "is_active"
-    >,
+    payload: Omit<CreateMerchantDTO, "created_by">,
   ) => {
     if (!user.value) throw new Error("User not authenticated");
 
@@ -86,7 +61,7 @@ export const useMerchant = () => {
         await deleteFile("merchants", payload.logo_url);
       }
       // Upload new logo
-      logoUrl = await uploadLogo(newLogoFile);
+      logoUrl = await uploadImage("merchants", newLogoFile);
     }
 
     const updateData: UpdateMerchantDTO = {
@@ -110,7 +85,7 @@ export const useMerchant = () => {
       .eq("id", id)
       .single();
 
-    const merchant = data as Merchant | null;
+    const merchant = data as MerchantEntity | null;
 
     const { error: dbError } = await supabase
       .from("merchants")
@@ -136,7 +111,7 @@ export const useMerchant = () => {
     search?: string;
     page: number;
     limit: number;
-  }): Promise<{ data: MerchantWithProfile[]; total: number }> => {
+  }): Promise<{ data: Merchant[]; total: number }> => {
     const { search, page, limit } = params;
 
     const from = (page - 1) * limit;
@@ -150,7 +125,7 @@ export const useMerchant = () => {
       address, 
       logo_url, 
       is_active,
-      profiles:created_by (fullname)
+      creator_name
     `,
       {
         count: "exact",
@@ -169,21 +144,25 @@ export const useMerchant = () => {
 
     if (error) throw error;
 
-    const rawData = (data as unknown as MerchantResponse[]) || [];
+    return { data, total: count || 0 };
+  };
 
-    const transformed: MerchantWithProfile[] = rawData.map((m) => {
-      const { profiles, ...merchantData } = m;
-      return {
-        ...merchantData,
-        creator_name: profiles?.fullname ?? "Unknown",
-      };
-    });
-    return { data: transformed, total: count || 0 };
+  const fetchSimpleMerchants = async () => {
+    const { data, error } = await supabase
+      .from("merchants")
+      .select("id, name")
+      .order("created_at", {
+        ascending: true,
+      });
+
+    if (error) throw error;
+
+    return (data as SimpleMerchants[]) ?? [];
   };
 
   return {
     fetchMerchants,
-    uploadLogo,
+    fetchSimpleMerchants,
     toggleStatus,
     createMerchant,
     updateMerchant,

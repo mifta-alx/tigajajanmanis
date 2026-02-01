@@ -1,13 +1,14 @@
-import type { MerchantWithProfile } from "~/types/merchant";
+import type { Merchant } from "~/types/merchant";
 import { useMerchant } from "~/composables/useMerchant";
 import { z } from "zod";
 import { useForm } from "@tanstack/vue-form";
 
 export const useFormMerchant = (props: {
-  merchant?: MerchantWithProfile | null;
+  merchant?: Merchant | null;
   onSuccess: () => void;
 }) => {
-  const { uploadLogo, createMerchant, updateMerchant } = useMerchant();
+  const { uploadImage } = useUploadStorage();
+  const { createMerchant, updateMerchant } = useMerchant();
   const { success, error } = useToast();
   const loading = ref(false);
 
@@ -16,8 +17,8 @@ export const useFormMerchant = (props: {
   const formSchema = z.object({
     name: z
       .string()
-      .min(1, "Name is required")
-      .min(3, "Name must be at least 3 characters"),
+      .min(1, "Merchant name is required")
+      .min(3, "Merchant name must be at least 3 characters"),
 
     phone_number: z
       .string()
@@ -62,7 +63,7 @@ export const useFormMerchant = (props: {
           let logoUrl: string | null = null;
 
           if (logoFile.value instanceof File) {
-            logoUrl = await uploadLogo(logoFile.value);
+            logoUrl = await uploadImage("merchants", logoFile.value);
           }
           await createMerchant({
             name: value.name,
@@ -74,7 +75,7 @@ export const useFormMerchant = (props: {
         success(`Merchant ${actionText} successfully`);
         props.onSuccess();
       } catch (err) {
-        error(`Failed to ${actionText} user`);
+        error(`Failed to ${actionText} merchant`);
       } finally {
         loading.value = false;
       }
