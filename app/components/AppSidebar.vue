@@ -70,7 +70,6 @@ const items = [
     </SidebarContent>
     <SidebarFooter>
       <NavFooter />
-      <!--      <ModeToggle />-->
     </SidebarFooter>
     <SidebarRail />
   </Sidebar>

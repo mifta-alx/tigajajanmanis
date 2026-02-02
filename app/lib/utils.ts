@@ -37,3 +37,20 @@ export const convertToWebP = (file: File): Promise<Blob> => {
 export const isInvalid = (field: any) => {
   return field.state.meta.isTouched && !field.state.meta.isValid;
 };
+
+export const formatPrice = (price: number) => {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+  }).format(price);
+};
+
+export const unformatPriceBase = (formattedPrice: string) => {
+  if (!formattedPrice) return 0;
+  let numeric = formattedPrice.replace(/[^0-9,-]+/g, "");
+  numeric = numeric.replace(/\./g, "");
+  numeric = numeric.replace(",", ".");
+  const result = parseFloat(numeric);
+  return isNaN(result) ? 0 : result;
+};
