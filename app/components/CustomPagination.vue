@@ -18,7 +18,7 @@ const emit = defineEmits<{
     class="flex flex-col md:flex-row items-center justify-between px-2 w-full gap-4"
   >
     <div class="items-center gap-2 hidden md:flex">
-      <p class="text-sm font-medium text-muted-foreground">Rows per page</p>
+      <p class="text-sm font-normal text-muted-foreground">Rows per page</p>
       <Select
         :model-value="`${perPage}`"
         @update:model-value="(v) => emit('update:perPage', Number(v))"

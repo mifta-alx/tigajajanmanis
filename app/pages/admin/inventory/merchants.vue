@@ -53,18 +53,6 @@ const {
   },
 );
 
-const hasInitialData = ref(false);
-
-watch(
-  merchants,
-  (newVal) => {
-    if (newVal && newVal.total > 0) {
-      hasInitialData.value = true;
-    }
-  },
-  { immediate: true },
-);
-
 const openAddModal = () => {
   selectedMerchant.value = null;
   isModalOpen.value = true;
@@ -138,12 +126,7 @@ const confirmDeleteMerchant = async () => {
 <template>
   <div class="min-h-0 h-full">
     <EmptyView
-      v-if="
-        !pending &&
-        merchants?.total === 0 &&
-        !hasInitialData &&
-        !debouncedSearch
-      "
+      v-if="!pending && merchants?.total === 0 && !debouncedSearch"
       icon="store"
       name="merchant"
       :on-create="openAddModal"

@@ -27,11 +27,7 @@ const emit = defineEmits(["cancel", "confirm"]);
           >Cancel</Button
         >
         <Button @click="$emit('confirm')" :disabled="isDeleting">
-          <Icon
-            name="lucide:loader-2"
-            v-if="isDeleting"
-            class="h-4 w-4 animate-spin"
-          />
+          <Spinner class="size-4" v-if="isDeleting" />
           {{ isDeleting ? "Deleting..." : "Continue" }}
         </Button>
       </AlertDialogFooter>
