@@ -51,17 +51,16 @@ const handleLogin = async () => {
       }, 5000);
       return;
     }
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    const client = useSupabaseClient();
-    await client.auth.getSession();
+
     const role = data.user.app_metadata.role;
-    const url = role !== "admin" ? "/products" : "/admin/dashboard";
-    await navigateTo(url, {
+    const destination = role !== "admin" ? "/products" : "/admin/dashboard";
+    await navigateTo(destination, {
       replace: true,
       external: false,
     });
   } catch (err) {
     console.error("Login catch error:", err);
+  } finally {
     isNavigating.value = false;
   }
 };
