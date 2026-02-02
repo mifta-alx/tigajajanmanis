@@ -12,9 +12,14 @@
             class="mr-2 data-[orientation=vertical]:h-4"
           />
           <BreadcrumbLayout />
-          <template class="ml-auto flex items-center gap-2">
-            <ModeToggle />
-          </template>
+          <div class="ml-auto flex items-center gap-2">
+            <ClientOnly>
+              <ModeToggle />
+              <template #fallback>
+                <div class="size-9 rounded-md bg-muted animate-pulse" />
+              </template>
+            </ClientOnly>
+          </div>
         </div>
       </header>
       <div class="flex flex-1 flex-col p-4 gap-4">
