@@ -5,8 +5,8 @@ definePageMeta({
 });
 
 useSeoMeta({
-  title: "TigaJajan POS | Workflows > Stock In",
-  ogTitle: "TigaJajan POS | Workflows > Stock In",
+  title: "TigaJajan POS | Sales",
+  ogTitle: "TigaJajan POS | Sales",
   description: "",
   ogDescription: "",
 });

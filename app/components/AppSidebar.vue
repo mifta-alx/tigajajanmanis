@@ -37,7 +37,7 @@ const items = [
   },
   {
     title: "Sales",
-    url: "#",
+    url: "/admin/sales",
     icon: "circle-dollar-sign",
   },
   {

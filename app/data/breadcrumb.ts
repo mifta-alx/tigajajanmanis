@@ -15,6 +15,16 @@ export const breadcrumbList: Record<string, BreadcrumbStep[]> = {
     { label: "Inventory" },
     { label: "Products" },
   ],
+  "/admin/workflows/stock-in": [
+    { label: "Dashboard", href: "/admin/dashboard" },
+    { label: "Workflows" },
+    { label: "Stock In" },
+  ],
+  "/admin/workflows/settlement": [
+    { label: "Dashboard", href: "/admin/dashboard" },
+    { label: "Workflows" },
+    { label: "Settlement" },
+  ],
   "/admin/sales": [
     { label: "Dashboard", href: "/admin/dashboard" },
     { label: "Sales" },
