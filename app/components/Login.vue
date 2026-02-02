@@ -54,10 +54,7 @@ const handleLogin = async () => {
 
     const role = data.user.app_metadata.role;
     const destination = role !== "admin" ? "/products" : "/admin/dashboard";
-    await navigateTo(destination, {
-      replace: true,
-      external: false,
-    });
+    window.location.href = destination;
   } catch (err) {
     console.error("Login catch error:", err);
   } finally {
