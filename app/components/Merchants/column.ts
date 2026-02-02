@@ -28,13 +28,14 @@ export const getColumns = (
   {
     accessorKey: "name",
     size: 200,
-    header: () => h("div", { class: "text-left" }, "Merchant name"),
+    header: () => h("div", { class: "text-left" }, "Merchant"),
     cell: ({ row }) => {
       const merchant = row.original;
+      const firstLetter = merchant.name.substring(0, 1);
       const imageSrc =
         merchant.logo_url && merchant.logo_url !== ""
           ? merchant.logo_url
-          : "https://placehold.co/32x32?text=M";
+          : `https://placehold.co/32x32?text=${firstLetter}`;
       return h("div", { class: "flex items-center gap-2" }, [
         h(NuxtImg as any, {
           class: "size-8 rounded-sm object-cover",
@@ -52,7 +53,7 @@ export const getColumns = (
     cell: ({ row }) => {
       const val = row.getValue("address") as string;
       const address = val && val.trim() !== "" ? val : "-";
-      return h("div", { class: "text-wrap" }, address);
+      return h("div", { class: "text-wrap text-muted-foreground" }, address);
     },
   },
   {
@@ -79,7 +80,12 @@ export const getColumns = (
     accessorKey: "creator_name",
     size: 200,
     header: () => h("div", { class: "text-left" }, "Created by"),
-    cell: ({ row }) => h("div", { class: "" }, row.getValue("creator_name")),
+    cell: ({ row }) =>
+      h(
+        "div",
+        { class: "text-muted-foreground" },
+        row.getValue("creator_name"),
+      ),
   },
   {
     id: "actions",

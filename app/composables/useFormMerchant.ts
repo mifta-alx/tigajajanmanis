@@ -7,7 +7,6 @@ export const useFormMerchant = (props: {
   merchant?: Merchant | null;
   onSuccess: () => void;
 }) => {
-  const { uploadImage } = useUploadStorage();
   const { createMerchant, updateMerchant } = useMerchant();
   const { success, error } = useToast();
   const loading = ref(false);
@@ -47,30 +46,18 @@ export const useFormMerchant = (props: {
       loading.value = true;
 
       const actionText = props.merchant ? "updated" : "created";
+
+      const payload = {
+        name: value.name,
+        phone_number: value.phone_number,
+        address: value.address,
+        logo_url: props.merchant?.logo_url ?? "",
+      };
       try {
         if (props.merchant) {
-          await updateMerchant(
-            props.merchant.id,
-            {
-              name: value.name,
-              phone_number: value.phone_number,
-              address: value.address,
-              logo_url: props.merchant?.logo_url,
-            },
-            logoFile.value,
-          );
+          await updateMerchant(props.merchant.id, payload, logoFile.value);
         } else {
-          let logoUrl: string | null = null;
-
-          if (logoFile.value instanceof File) {
-            logoUrl = await uploadImage("merchants", logoFile.value);
-          }
-          await createMerchant({
-            name: value.name,
-            phone_number: value.phone_number,
-            address: value.address,
-            logo_url: logoUrl,
-          });
+          await createMerchant(payload, logoFile.value);
         }
         success(`Merchant ${actionText} successfully`);
         props.onSuccess();

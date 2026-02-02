@@ -17,15 +17,21 @@ export const useMerchant = () => {
   const { uploadImage } = useUploadStorage();
 
   const createMerchant = async (
-    payload: Omit<CreateMerchantDTO, "created_by">,
+    payload: Omit<CreateMerchantDTO, "created_by" | "logo_url">,
+    logoFile?: File | null,
   ) => {
     if (!user.value) throw new Error("User not authenticated");
+
+    let logoUrl: string | null = null;
+    if (logoFile instanceof File) {
+      logoUrl = await uploadImage("merchants", logoFile);
+    }
 
     const insertData: CreateMerchantDTO = {
       name: payload.name,
       phone_number: payload.phone_number,
       address: payload.address,
-      logo_url: payload.logo_url,
+      logo_url: logoUrl,
       created_by: user.value.sub,
     };
 
