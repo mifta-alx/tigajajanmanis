@@ -46,7 +46,7 @@ export const getColumns = (
     cell: ({ row }) => {
       const val = row.getValue("address") as string;
       const address = val && val.trim() !== "" ? val : "-";
-      return h("div", { class: "text-wrap" }, address);
+      return h("div", { class: "text-wrap text-muted-foreground" }, address);
     },
   },
   {

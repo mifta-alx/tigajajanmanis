@@ -28,7 +28,7 @@ const { form, loading } = useFormUser({
         <form.Field name="fullname">
           <template #default="{ field }">
             <Field :data-invalid="isInvalid(field)">
-              <FieldLabel for="field.name">
+              <FieldLabel :for="field.name">
                 Full name
                 <span className="text-destructive">*</span>
               </FieldLabel>
@@ -198,11 +198,7 @@ const { form, loading } = useFormUser({
         Cancel
       </Button>
       <Button type="submit" :disabled="loading">
-        <Icon
-          name="lucide:loader-2"
-          v-if="loading"
-          class="h-4 w-4 animate-spin"
-        />
+        <Spinner class="size-4" v-if="loading" />
         {{ loading ? "Saving..." : "Save" }}
       </Button>
     </Field>

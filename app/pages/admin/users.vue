@@ -53,18 +53,6 @@ const {
   },
 );
 
-const hasInitialData = ref(false);
-
-watch(
-  users,
-  (newVal) => {
-    if (newVal && newVal.total > 0) {
-      hasInitialData.value = true;
-    }
-  },
-  { immediate: true },
-);
-
 const openAddModal = () => {
   selectedUser.value = null;
   isModalOpen.value = true;
@@ -144,9 +132,7 @@ const confirmDeleteUser = async () => {
 <template>
   <div class="min-h-0 h-full">
     <EmptyView
-      v-if="
-        !pending && users?.total === 0 && !hasInitialData && !debouncedSearch
-      "
+      v-if="!pending && users?.total === 0 && !debouncedSearch"
       icon="users-round"
       name="user"
       :on-create="openAddModal"

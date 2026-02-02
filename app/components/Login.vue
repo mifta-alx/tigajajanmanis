@@ -134,7 +134,8 @@ const isProcessing = computed(() => loading.value || isNavigating.value);
       </Field>
       <Field>
         <Button type="submit" :disabled="isProcessing">
-          {{ isProcessing ? "Processing..." : "Login" }}
+          <Spinner class="size-4" v-if="isProcessing" />
+          <span v-else>Login</span>
         </Button>
       </Field>
       <Field>
