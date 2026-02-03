@@ -19,6 +19,17 @@ const { form, loading, imageFile } = useFormProduct({
   product: props.product,
   onSuccess: () => emit("success"),
 });
+
+const formatDisplay = (val: number) => {
+  if (!val) return "";
+  return new Intl.NumberFormat("id-ID").format(val);
+};
+
+const unformatPriceBase = (val: string) => {
+  if (!val) return 0;
+  const numeric = val.replace(/\D/g, "");
+  return parseInt(numeric, 10) || 0;
+};
 </script>
 
 <template>
@@ -121,12 +132,14 @@ const { form, loading, imageFile } = useFormProduct({
                 <InputGroupInput
                   :id="field.name"
                   :name="field.name"
-                  :model-value="field.state.value"
+                  :model-value="formatDisplay(field.state.value)"
                   :aria-invalid="isInvalid(field)"
                   placeholder="0.00"
                   autocomplete="off"
                   @blur="field.handleBlur"
-                  @input="field.handleChange($event.target.value)"
+                  @input="
+                    (e) => field.handleChange(unformatPriceBase(e.target.value))
+                  "
                 />
               </InputGroup>
               <FieldError
@@ -151,12 +164,14 @@ const { form, loading, imageFile } = useFormProduct({
                 <InputGroupInput
                   :id="field.name"
                   :name="field.name"
-                  :model-value="field.state.value"
+                  :model-value="formatDisplay(field.state.value)"
                   :aria-invalid="isInvalid(field)"
                   placeholder="0.00"
                   autocomplete="off"
                   @blur="field.handleBlur"
-                  @input="field.handleChange($event.target.value)"
+                  @input="
+                    (e) => field.handleChange(unformatPriceBase(e.target.value))
+                  "
                 />
               </InputGroup>
               <FieldError

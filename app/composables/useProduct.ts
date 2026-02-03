@@ -4,7 +4,6 @@ import type {
   Product,
 } from "~/types/product";
 import type { ProductEntity } from "~/types/models";
-import { formatPrice } from "~/lib/utils";
 
 interface ProductResponse {
   id: string;
@@ -174,7 +173,7 @@ export const useProduct = () => {
         selling_price,
         cost_price,
         profit: (selling_price || 0) - (cost_price || 0),
-        merchant_name: merchants?.name ?? "System",
+        merchant_name: merchants?.name ?? "-",
       };
     });
     return { data: transformed, total: count || 0 };
