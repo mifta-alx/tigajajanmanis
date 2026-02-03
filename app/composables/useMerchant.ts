@@ -17,21 +17,21 @@ export const useMerchant = () => {
   const { uploadImage } = useUploadStorage();
 
   const createMerchant = async (
-    payload: Omit<CreateMerchantDTO, "created_by" | "logo_url">,
-    logoFile?: File | null,
+    payload: Omit<CreateMerchantDTO, "created_by" | "image_url">,
+    imageFile?: File | null,
   ) => {
     if (!user.value) throw new Error("User not authenticated");
 
-    let logoUrl: string | null = null;
-    if (logoFile instanceof File) {
-      logoUrl = await uploadImage("merchants", logoFile);
+    let imageUrl: string | null = null;
+    if (imageFile instanceof File) {
+      imageUrl = await uploadImage("merchants", imageFile);
     }
 
     const insertData: CreateMerchantDTO = {
       name: payload.name,
       phone_number: payload.phone_number,
       address: payload.address,
-      logo_url: logoUrl,
+      image_url: imageUrl,
       created_by: user.value.sub,
     };
 
@@ -48,33 +48,33 @@ export const useMerchant = () => {
   const updateMerchant = async (
     id: string,
     payload: UpdateMerchantDTO,
-    newLogoFile?: File | null,
+    newImageFile?: File | null,
   ) => {
     if (!user.value) throw new Error("User not authenticated");
 
     //existing image
-    let logoUrl = payload.logo_url as string | null;
+    let imageUrl = payload.image_url as string | null;
 
-    if (newLogoFile === null) {
+    if (newImageFile === null) {
       // User removed the logo - delete from storage
-      if (payload.logo_url) {
-        await deleteFile("merchants", payload.logo_url);
+      if (payload.image_url) {
+        await deleteFile("merchants", payload.image_url);
       }
-      logoUrl = null;
-    } else if (newLogoFile instanceof File) {
+      imageUrl = null;
+    } else if (newImageFile instanceof File) {
       // User uploaded new logo - delete old one first
-      if (payload.logo_url) {
-        await deleteFile("merchants", payload.logo_url);
+      if (payload.image_url) {
+        await deleteFile("merchants", payload.image_url);
       }
       // Upload new logo
-      logoUrl = await uploadImage("merchants", newLogoFile);
+      imageUrl = await uploadImage("merchants", newImageFile);
     }
 
     const updateData: UpdateMerchantDTO = {
       name: payload.name,
       phone_number: payload.phone_number,
       address: payload.address,
-      logo_url: logoUrl,
+      image_url: imageUrl,
     };
 
     const { error } = await (supabase.from("merchants") as any)
@@ -87,7 +87,7 @@ export const useMerchant = () => {
   const deleteMerchant = async (id: string) => {
     const { data } = await supabase
       .from("merchants")
-      .select("logo_url")
+      .select("image_url")
       .eq("id", id)
       .single();
 
@@ -100,8 +100,8 @@ export const useMerchant = () => {
 
     if (dbError) throw dbError;
 
-    if (merchant?.logo_url) {
-      await deleteFile("merchants", merchant.logo_url);
+    if (merchant?.image_url) {
+      await deleteFile("merchants", merchant.image_url);
     }
   };
 
@@ -129,7 +129,7 @@ export const useMerchant = () => {
       name, 
       phone_number, 
       address, 
-      logo_url, 
+      image_url, 
       is_active,
       creator_name
     `,

@@ -8,7 +8,7 @@ const props = defineProps<{
 
 const emit = defineEmits(["success", "cancel"]);
 
-const { form, loading, logoFile } = useFormMerchant({
+const { form, loading, imageFile } = useFormMerchant({
   merchant: props.merchant,
   onSuccess: () => emit("success"),
 });
@@ -17,14 +17,14 @@ const { form, loading, logoFile } = useFormMerchant({
 <template>
   <form @submit.prevent="form.handleSubmit" class="space-y-4">
     <FieldGroup class="grid sm:grid-cols-4 gap-4">
-      <form.Field name="logo_file">
+      <form.Field name="image_file">
         <template #default="{ field }">
           <ImageUpload
             label="Logo"
-            :model-value="props.merchant?.logo_url"
+            :model-value="props.merchant?.image_url"
             @change="
               (file) => {
-                logoFile = file;
+                imageFile = file;
                 field.handleChange(file);
               }
             "

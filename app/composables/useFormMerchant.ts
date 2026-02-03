@@ -11,7 +11,7 @@ export const useFormMerchant = (props: {
   const { success, error } = useToast();
   const loading = ref(false);
 
-  const logoFile = ref<File | null | undefined>(undefined);
+  const imageFile = ref<File | null | undefined>(undefined);
 
   const formSchema = z.object({
     name: z
@@ -27,8 +27,8 @@ export const useFormMerchant = (props: {
       .regex(/^[0-9]+$/, "Phone number must contain only numbers"),
 
     address: z.string(),
-    logo_url: z.string(),
-    logo_file: z.any(),
+    image_url: z.string(),
+    image_file: z.any(),
   });
 
   const form = useForm({
@@ -36,8 +36,8 @@ export const useFormMerchant = (props: {
       name: props.merchant?.name ?? "",
       phone_number: props.merchant?.phone_number ?? "",
       address: props.merchant?.address ?? "",
-      logo_url: props.merchant?.logo_url ?? "",
-      logo_file: undefined as File | null | undefined,
+      image_url: props.merchant?.image_url ?? "",
+      image_file: undefined as File | null | undefined,
     },
     validators: {
       onSubmit: formSchema,
@@ -51,13 +51,13 @@ export const useFormMerchant = (props: {
         name: value.name,
         phone_number: value.phone_number,
         address: value.address,
-        logo_url: props.merchant?.logo_url ?? "",
+        image_url: props.merchant?.image_url ?? "",
       };
       try {
         if (props.merchant) {
-          await updateMerchant(props.merchant.id, payload, logoFile.value);
+          await updateMerchant(props.merchant.id, payload, imageFile.value);
         } else {
-          await createMerchant(payload, logoFile.value);
+          await createMerchant(payload, imageFile.value);
         }
         success(`Merchant ${actionText} successfully`);
         props.onSuccess();
@@ -69,5 +69,5 @@ export const useFormMerchant = (props: {
     },
   });
 
-  return { form, loading, logoFile };
+  return { form, loading, imageFile };
 };

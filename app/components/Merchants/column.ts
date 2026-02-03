@@ -33,8 +33,8 @@ export const getColumns = (
       const merchant = row.original;
       const firstLetter = merchant.name.substring(0, 1);
       const imageSrc =
-        merchant.logo_url && merchant.logo_url !== ""
-          ? merchant.logo_url
+        merchant.image_url && merchant.image_url !== ""
+          ? merchant.image_url
           : `https://placehold.co/32x32?text=${firstLetter}`;
       return h("div", { class: "flex items-center gap-2" }, [
         h(NuxtImg as any, {
