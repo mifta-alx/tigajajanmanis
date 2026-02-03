@@ -7,7 +7,7 @@ export interface Profile {
   phone_number: string;
   address: string | null;
   role: Role;
-  status: 0 | 1;
+  is_active: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -17,7 +17,7 @@ export interface MerchantEntity {
   name: string;
   phone_number: string;
   address: string | null;
-  logo_url: string | null;
+  image_url: string | null;
   is_active: boolean;
   created_by: string;
   creator_name: string;
@@ -35,6 +35,19 @@ export interface ProductEntity {
   sku: string;
   image_url: string | null;
   is_active: boolean;
+  created_by: string;
+  creator_name: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StockEntity {
+  id: string;
+  merchant_id: string;
+  product_id: string;
+  quantity: number;
+  entry_date: string;
+  notes: string;
   created_by: string;
   creator_name: string;
   created_at: string;

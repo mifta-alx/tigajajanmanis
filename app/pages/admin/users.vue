@@ -68,20 +68,20 @@ const onSuccessMutation = () => {
   isModalOpen.value = false;
 };
 
-const handleStatusChange = async (userId: string, newStatus: number) => {
+const handleStatusChange = async (userId: string, newStatus: boolean) => {
   updatingIds.value.add(userId);
   try {
     await toggleStatus(userId, newStatus);
 
     const targetUser = users.value?.data.find((u) => u.id === userId);
     if (targetUser) {
-      targetUser.status = newStatus as 0 | 1;
+      targetUser.is_active = newStatus;
     }
 
-    const status = newStatus === 1 ? "activated" : "deactivated";
+    const status = newStatus ? "activated" : "deactivated";
     success(`User has been ${status}`);
   } catch (err) {
-    const action = newStatus === 1 ? "activate" : "deactivate";
+    const action = newStatus ? "activate" : "deactivate";
     error(`Failed to ${action} user`);
     await refresh();
   } finally {

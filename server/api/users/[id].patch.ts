@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const config = useRuntimeConfig();
 
-  const { status } = body;
+  const { is_active } = body;
 
   if (!id || id === "undefined" || id === "[id]") {
     throw createError({
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
     const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(
       id,
       {
-        app_metadata: { status: status },
+        app_metadata: { is_active: is_active },
       },
     );
 
@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
 
     const { error: dbError } = await supabaseAdmin
       .from("profiles")
-      .update({ status: status })
+      .update({ is_active: is_active })
       .eq("id", id);
 
     if (dbError) throw dbError;

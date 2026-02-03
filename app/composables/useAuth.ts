@@ -35,9 +35,8 @@ export const useAuth = () => {
         };
       }
 
-      const status = data.user?.app_metadata?.status;
-
-      if (status === 0) {
+      const isActive = data.user?.app_metadata?.is_active;
+      if (!isActive) {
         await client.auth.signOut();
         throw {
           title: "Account Disabled",

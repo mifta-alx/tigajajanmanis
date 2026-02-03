@@ -41,11 +41,11 @@ export const useUser = () => {
     }
   };
 
-  const toggleStatus = async (userId: string, newStatus: number) => {
+  const toggleStatus = async (userId: string, newStatus: boolean) => {
     try {
       await $fetch(`/api/users/${userId}`, {
         method: "PATCH",
-        body: { status: newStatus },
+        body: { is_active: newStatus },
       });
     } catch (err) {
       throw err;
@@ -67,9 +67,12 @@ export const useUser = () => {
 
     let query = supabase
       .from("profiles")
-      .select("id, username, fullname, phone_number, address, role, status", {
-        count: "exact",
-      });
+      .select(
+        "id, username, fullname, phone_number, address, role, is_active",
+        {
+          count: "exact",
+        },
+      );
 
     if (search) {
       query = query.or(`fullname.ilike.%${search}%,username.ilike.%${search}%`);

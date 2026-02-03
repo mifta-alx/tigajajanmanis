@@ -15,7 +15,7 @@ import type { User } from "~/types/profiles";
 
 export const getColumns = (
   onDelete: (id: string) => void,
-  onStatusChange: (id: string, newStatus: number) => void,
+  onStatusChange: (id: string, newStatus: boolean) => void,
   onEdit: (user: User) => void,
   currentUserId: string | undefined,
   updatingIds: Ref<Set<string>>,
@@ -66,7 +66,7 @@ export const getColumns = (
     },
   },
   {
-    accessorKey: "status",
+    accessorKey: "is_active",
     header: () => h("div", { class: "text-center" }, "Status"),
     size: 64,
     cell: ({ row }) => {
@@ -79,11 +79,11 @@ export const getColumns = (
 
       return h("div", { class: "flex items-center justify-center" }, [
         h(Switch, {
-          checked: user.status === 1,
+          checked: user.is_active,
           disabled: isLoading || isCurrentUser,
           key: `switch-${user.id}`,
           onChange: (val: boolean) => {
-            onStatusChange(user.id, val ? 1 : 0);
+            onStatusChange(user.id, val);
           },
         }),
       ]);

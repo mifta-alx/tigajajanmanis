@@ -6,9 +6,9 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const guestRoutes = ["/", "/login"];
 
   const role = currentUser?.app_metadata?.role as Role | undefined;
-  const status = currentUser?.app_metadata?.status;
+  const isActive = currentUser?.app_metadata?.is_active;
 
-  if (currentUser && status === 0 && role !== "admin") {
+  if (currentUser && !isActive && role !== "admin") {
     const client = useSupabaseClient();
     await client.auth.signOut();
     return navigateTo("/login?error=account_disabled");
