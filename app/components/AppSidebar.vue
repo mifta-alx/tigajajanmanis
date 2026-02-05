@@ -8,6 +8,11 @@ const items = [
     icon: "chart-pie",
   },
   {
+    title: "Outlet",
+    url: "/admin/outlet",
+    icon: "store",
+  },
+  {
     title: "Inventory",
     icon: "package-2",
     items: [
