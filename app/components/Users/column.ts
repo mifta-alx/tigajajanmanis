@@ -34,14 +34,25 @@ export const getColumns = (
   },
   {
     accessorKey: "fullname",
-    size: 240,
+    size: 200,
     header: () => h("div", { class: "text-left" }, "Full name"),
     cell: ({ row }) =>
-      h("div", { class: "capitalize" }, row.getValue("fullname")),
+      h("div", { class: "capitalize text-wrap" }, row.getValue("fullname")),
+  },
+  {
+    accessorKey: "outlet_name",
+    size: 180,
+    header: () => h("div", { class: "text-left" }, "Outlet"),
+    cell: ({ row }) =>
+      h(
+        "div",
+        { class: "text-wrap text-muted-foreground" },
+        row.getValue("outlet_name"),
+      ),
   },
   {
     accessorKey: "address",
-    size: 280,
+    size: 200,
     header: () => h("div", { class: "text-left" }, "Address"),
     cell: ({ row }) => {
       const val = row.getValue("address") as string;

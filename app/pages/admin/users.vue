@@ -194,7 +194,10 @@ const confirmDeleteUser = async () => {
       />
     </div>
     <Dialog v-model:open="isModalOpen">
-      <DialogContent class="sm:max-w-xl">
+      <DialogContent
+        class="sm:max-w-xl"
+        @interact-outside="(event) => event.preventDefault()"
+      >
         <DialogHeader>
           <DialogTitle>{{
             selectedUser ? "Edit User" : "Add User"

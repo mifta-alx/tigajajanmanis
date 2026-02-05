@@ -15,9 +15,23 @@ const handleShowPassword = () => {
   showPassword.value = !showPassword.value;
 };
 
+const { fetchOutlets } = useOutlet();
+const { data: outletsResponse, pending: outletPending } = useAsyncData(
+  "outlets-list",
+  () => fetchOutlets(),
+);
+
+const outlets = computed(() => outletsResponse.value?.data || []);
 const { form, loading } = useFormUser({
   user: props.user,
   onSuccess: () => emit("success"),
+});
+
+const currentRole = ref<Role>(form.getFieldValue("role") || "staff");
+watch(currentRole, (newRole) => {
+  if (newRole === "admin") {
+    form.setFieldValue("outlet_id", null);
+  }
 });
 </script>
 
@@ -150,7 +164,12 @@ const { form, loading } = useFormUser({
             <Select
               :name="field.name"
               :model-value="field.state.value"
-              @update:model-value="(val) => field.handleChange(val as Role)"
+              @update:model-value="
+                (val) => {
+                  field.handleChange(val as Role);
+                  currentRole = val as Role;
+                }
+              "
             >
               <SelectTrigger :id="field.name" :aria-invalid="isInvalid(field)">
                 <SelectValue placeholder="Select role" />
@@ -167,7 +186,66 @@ const { form, loading } = useFormUser({
           </Field>
         </template>
       </form.Field>
-
+      <div class="sm:col-span-2">
+        <form.Field name="outlet_id">
+          <template #default="{ field }">
+            <Field :data-invalid="isInvalid(field)">
+              <FieldLabel :for="field.name">
+                Outlet
+                <span v-if="currentRole === 'staff'" class="text-destructive"
+                  >*</span
+                >
+              </FieldLabel>
+              <Select
+                :name="field.name"
+                :model-value="field.state.value ?? ''"
+                :disabled="currentRole === 'admin'"
+                @update:model-value="
+                  (val: any) => {
+                    const finalValue =
+                      val === '' || val === undefined ? null : String(val);
+                    field.handleChange(finalValue);
+                  }
+                "
+              >
+                <SelectTrigger
+                  :id="field.name"
+                  :class="{
+                    'opacity-50 pointer-events-none': currentRole === 'admin',
+                  }"
+                >
+                  <SelectValue
+                    :placeholder="
+                      currentRole === 'admin'
+                        ? 'All Outlets (Admin)'
+                        : 'Select outlet'
+                    "
+                  />
+                </SelectTrigger>
+                <SelectContent position="item-aligned">
+                  <div
+                    v-if="outletPending"
+                    class="flex items-center justify-center py-2"
+                  >
+                    <Spinner />
+                  </div>
+                  <SelectItem
+                    v-for="outlet in outlets"
+                    :key="outlet.id"
+                    :value="outlet.id"
+                  >
+                    {{ outlet.name }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <FieldError
+                v-if="isInvalid(field)"
+                :errors="[field.state.meta.errors[0]]"
+              />
+            </Field>
+          </template>
+        </form.Field>
+      </div>
       <div class="sm:col-span-2">
         <form.Field name="address">
           <template #default="{ field }">

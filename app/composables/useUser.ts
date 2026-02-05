@@ -1,7 +1,21 @@
-import type { Profile } from "~/types/models";
 import type { Role } from "~/types/role";
-import type { CreateProfileDTO, UpdateProfileDTO } from "~/types/profiles";
+import type {
+  CreateProfileDTO,
+  UpdateProfileDTO,
+  User,
+} from "~/types/profiles";
 
+interface ProfileResponse {
+  id: string;
+  username: string;
+  fullname: string;
+  phone_number: string;
+  address: string | null;
+  role: Role;
+  is_active: boolean;
+  outlet_id: string | null;
+  outlets: { name: string } | null;
+}
 export const useUser = () => {
   const supabase = useSupabaseClient();
 
@@ -22,6 +36,7 @@ export const useUser = () => {
       phone_number: payload.phone_number,
       address: payload.address ?? null,
       role: payload.role as Role,
+      outlet_id: payload.outlet_id,
     };
     const { error } = await (supabase.from("profiles") as any)
       .update(updateData)
@@ -54,13 +69,13 @@ export const useUser = () => {
 
   const fetchUsers = async (params: {
     search?: string;
-    page: number;
-    limit: number;
+    page?: number;
+    limit?: number;
   }): Promise<{
-    data: Omit<Profile, "created_at" | "updated_at">[];
+    data: User[];
     total: number;
   }> => {
-    const { search, page, limit } = params;
+    const { search, page = 1, limit = 1000 } = params;
 
     const from = (page - 1) * limit;
     const to = from + limit - 1;
@@ -68,7 +83,7 @@ export const useUser = () => {
     let query = supabase
       .from("profiles")
       .select(
-        "id, username, fullname, phone_number, address, role, is_active",
+        "id, username, fullname, phone_number, address, role, is_active, outlet_id, outlets:outlet_id (name)",
         {
           count: "exact",
         },
@@ -82,10 +97,20 @@ export const useUser = () => {
       .order("created_at", { ascending: true })
       .range(from, to);
 
+    const rawData = (data as unknown as ProfileResponse[]) || [];
+
+    const transformed: User[] = rawData.map((m) => {
+      const { outlets, ...profileData } = m;
+      return {
+        ...profileData,
+        outlet_name: outlets?.name ?? "All Outlets",
+      };
+    });
+
     if (error) throw error;
 
     return {
-      data,
+      data: transformed,
       total: count || 0,
     };
   };
