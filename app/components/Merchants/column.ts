@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { Icon } from "@iconify/vue";
-import { NuxtImg } from "#components";
+import ImageWithFallback from "~/components/ImageWithFallback.vue";
 
 export const getColumns = (
   onDelete: (id: string) => void,
@@ -37,18 +37,50 @@ export const getColumns = (
           ? merchant.image_url
           : `https://placehold.co/32x32?text=${firstLetter}`;
       return h("div", { class: "flex items-center gap-2" }, [
-        h(NuxtImg as any, {
-          class: "size-8 rounded-sm object-cover",
+        h(ImageWithFallback, {
+          class: "size-8 rounded-sm",
+          imgClass: "size-8 rounded-sm",
+          skeletonClass: "size-8 rounded-sm",
           src: imageSrc,
           alt: merchant.name,
         }),
 
-        h("p", {}, row.getValue("name")),
+        h("p", { class: "text-wrap" }, row.getValue("name")),
       ]);
     },
   },
   {
+    accessorKey: "outlet_names",
+    header: () => h("div", { class: "text-left" }, "Outlets"),
+    cell: ({ row }) => {
+      const merchant = row.original;
+      const names =
+        merchant.outlet_merchants
+          ?.map((om) => om.outlets?.name)
+          .filter(Boolean) || [];
+
+      if (names.length === 0)
+        return h("span", { class: "text-muted-foreground" }, "-");
+
+      return h(
+        "div",
+        { class: "flex flex-wrap gap-1" },
+        names.map((name) =>
+          h(
+            "span",
+            {
+              class:
+                "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800",
+            },
+            name,
+          ),
+        ),
+      );
+    },
+  },
+  {
     accessorKey: "address",
+    size: 200,
     header: () => h("div", { class: "text-left" }, "Address"),
     cell: ({ row }) => {
       const val = row.getValue("address") as string;
@@ -78,12 +110,12 @@ export const getColumns = (
   },
   {
     accessorKey: "creator_name",
-    size: 200,
+    size: 120,
     header: () => h("div", { class: "text-left" }, "Created by"),
     cell: ({ row }) =>
       h(
         "div",
-        { class: "text-muted-foreground" },
+        { class: "text-muted-foreground text-wrap" },
         row.getValue("creator_name"),
       ),
   },

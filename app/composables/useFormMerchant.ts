@@ -21,14 +21,24 @@ export const useFormMerchant = (props: {
 
     phone_number: z
       .string()
-      .min(1, "Phone number is required")
-      .min(10, "Phone number must be at least 10 digits")
-      .max(15, "Phone number must be at most 15 digits")
-      .regex(/^[0-9]+$/, "Phone number must contain only numbers"),
+      .transform((val) => val ?? "")
+      .refine(
+        (val) => !val || val.length >= 10,
+        "Phone number must be at least 10 digits",
+      )
+      .refine(
+        (val) => !val || val.length <= 15,
+        "Phone number must be at most 15 digits",
+      )
+      .refine(
+        (val) => !val || /^[0-9]+$/.test(val),
+        "Phone number must contain only numbers",
+      ),
 
     address: z.string(),
     image_url: z.string(),
     image_file: z.any(),
+    outlet_ids: z.array(z.string()).default([]),
   });
 
   const form = useForm({
@@ -38,9 +48,12 @@ export const useFormMerchant = (props: {
       address: props.merchant?.address ?? "",
       image_url: props.merchant?.image_url ?? "",
       image_file: undefined as File | null | undefined,
+      outlet_ids: props.merchant?.outlet_merchants
+        ? props.merchant.outlet_merchants.map((om) => om.outlet_id)
+        : [],
     },
     validators: {
-      onSubmit: formSchema,
+      onSubmit: formSchema as any,
     },
     onSubmit: async ({ value }) => {
       loading.value = true;
@@ -49,9 +62,10 @@ export const useFormMerchant = (props: {
 
       const payload = {
         name: value.name,
-        phone_number: value.phone_number,
+        phone_number: value.phone_number || null,
         address: value.address,
-        image_url: props.merchant?.image_url ?? "",
+        image_url: value.image_url ?? "",
+        outlet_ids: value.outlet_ids,
       };
       try {
         if (props.merchant) {

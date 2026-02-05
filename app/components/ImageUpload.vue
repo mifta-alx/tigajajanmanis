@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Trash, Image } from "lucide-vue-next";
 const props = defineProps<{
   modelValue?: string | null; // url preview image
   label?: string;
@@ -57,13 +58,14 @@ watch(
       <div tabindex="0" class="sr-only" autofocus />
       <div
         v-if="displayImage"
-        class="relative h-[120px] w-full overflow-hidden rounded-md border border-input"
+        class="relative h-48 sm:h-[120px] w-full overflow-hidden rounded-md border border-input"
         @mouseenter="isHovered = true"
         @mouseleave="isHovered = false"
       >
-        <NuxtImg
+        <ImageWithFallback
           :src="displayImage"
-          class="h-full w-full object-cover"
+          imgClass="h-full w-full object-cover"
+          skeletonClass="h-full w-full"
           alt="Preview"
         />
 
@@ -77,7 +79,7 @@ watch(
             size="icon"
             @click.stop="handleRemove"
           >
-            <Icon name="lucide:trash" class="size-6" />
+            <Trash class="size-6" />
           </Button>
         </div>
       </div>
@@ -85,7 +87,7 @@ watch(
       <div
         v-else
         tabindex="0"
-        class="flex flex-col items-center justify-center h-[120px] w-full border rounded-md transition-all duration-300 bg-input/30 hover:bg-input/60"
+        class="flex flex-col items-center justify-center h-48 sm:h-[120px] w-full border rounded-md transition-all duration-300 bg-input/30 hover:bg-input/60"
         :class="[error ? 'border-destructive' : 'border-input']"
         @click="handleFilePickerClick"
         @keydown.enter="handleFilePickerClick"
@@ -93,7 +95,7 @@ watch(
         <div
           class="flex flex-col items-center justify-center space-y-3 text-muted-foreground"
         >
-          <Icon name="lucide:image" class="size-6" />
+          <Image class="size-6" />
           <div class="text-center">
             <p class="text-[10px]">Choose image</p>
           </div>

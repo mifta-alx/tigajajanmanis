@@ -1,11 +1,22 @@
 <script setup lang="ts">
+import { LogOut } from "lucide-vue-next";
 import { useSidebar } from "~/components/ui/sidebar";
 import type { Role } from "~/types/role";
 const { logout } = useAuth();
 const user = useSupabaseUser();
 const { isMobile } = useSidebar();
 const role = user.value?.app_metadata?.role as Role | undefined;
-const username = user?.value?.user_metadata?.username as string;
+const fullname = user?.value?.user_metadata?.fullname as string;
+const initials = computed(() => {
+  if (!fullname) return "U";
+
+  return fullname
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase()
+    .substring(0, 2);
+});
 </script>
 
 <template>
@@ -17,15 +28,14 @@ const username = user?.value?.user_metadata?.username as string;
             size="lg"
             class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           >
-            <!--            <Avatar class="h-8 w-8 rounded-lg grayscale">-->
-            <!--              <AvatarImage :src="user.avatar" :alt="user.name" />-->
-            <!--              <AvatarFallback class="rounded-lg">-->
-            <!--                CN-->
-            <!--              </AvatarFallback>-->
-            <!--            </Avatar>-->
+            <Avatar class="h-8 w-8 rounded-lg grayscale">
+              <AvatarFallback class="rounded-lg">
+                {{ initials }}
+              </AvatarFallback>
+            </Avatar>
             <div class="grid flex-1 text-left text-sm leading-tight">
-              <span class="truncate font-medium">{{ username }}</span>
-              <span class="text-muted-foreground truncate text-xs">
+              <span class="truncate font-medium">{{ fullname }}</span>
+              <span class="text-muted-foreground truncate text-xs capitalize">
                 {{ role }}
               </span>
             </div>
@@ -40,15 +50,14 @@ const username = user?.value?.user_metadata?.username as string;
         >
           <DropdownMenuLabel class="p-0 font-normal">
             <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-              <!--              <Avatar class="h-8 w-8 rounded-lg">-->
-              <!--                <AvatarImage :src="user.avatar" :alt="user.name" />-->
-              <!--                <AvatarFallback class="rounded-lg">-->
-              <!--                  CN-->
-              <!--                </AvatarFallback>-->
-              <!--              </Avatar>-->
+              <Avatar class="h-8 w-8 rounded-lg">
+                <AvatarFallback class="rounded-lg">
+                  {{ initials }}
+                </AvatarFallback>
+              </Avatar>
               <div class="grid flex-1 text-left text-sm leading-tight">
-                <span class="truncate font-medium">{{ username }}</span>
-                <span class="text-muted-foreground truncate text-xs">
+                <span class="truncate font-medium">{{ fullname }}</span>
+                <span class="text-muted-foreground truncate text-xs capitalize">
                   {{ role }}
                 </span>
               </div>
@@ -71,7 +80,7 @@ const username = user?.value?.user_metadata?.username as string;
           <!--          </DropdownMenuGroup>-->
           <!--          <DropdownMenuSeparator />-->
           <DropdownMenuItem @click="logout()">
-            <Icon name="lucide:log-out" />
+            <LogOut class="size-3.5" />
             Log out
           </DropdownMenuItem>
         </DropdownMenuContent>

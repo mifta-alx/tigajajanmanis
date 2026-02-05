@@ -1,13 +1,24 @@
 import type {
   CreateMerchantDTO,
   Merchant,
+  MerchantInput,
+  SimpleMerchants,
   UpdateMerchantDTO,
 } from "~/types/merchant";
 import type { MerchantEntity } from "~/types/models";
 
-interface SimpleMerchants {
+interface MerchantResponse {
   id: string;
   name: string;
+  phone_number: string | null;
+  address: string | null;
+  image_url: string;
+  is_active: boolean;
+  profiles: { fullname: string } | null;
+  outlet_merchants: {
+    outlet_id: string;
+    outlets: { name: string } | null;
+  }[];
 }
 
 export const useMerchant = () => {
@@ -17,10 +28,11 @@ export const useMerchant = () => {
   const { uploadImage } = useUploadStorage();
 
   const createMerchant = async (
-    payload: Omit<CreateMerchantDTO, "created_by" | "image_url">,
+    payload: MerchantInput,
     imageFile?: File | null,
   ) => {
     if (!user.value) throw new Error("User not authenticated");
+    const { outlet_ids, ...merchantData } = payload;
 
     let imageUrl: string | null = null;
     if (imageFile instanceof File) {
@@ -28,21 +40,34 @@ export const useMerchant = () => {
     }
 
     const insertData: CreateMerchantDTO = {
-      name: payload.name,
-      phone_number: payload.phone_number,
-      address: payload.address,
+      ...merchantData,
       image_url: imageUrl,
       created_by: user.value.sub,
     };
 
-    const { data, error } = await supabase
+    const { data: newMerchant, error: merchantError } = await supabase
       .from("merchants")
       .insert(insertData as any)
       .select()
       .single();
 
-    if (error) throw error;
-    return data as Merchant;
+    if (merchantError) throw merchantError;
+
+    const merchantId = (newMerchant as MerchantEntity).id;
+
+    if (outlet_ids && outlet_ids.length > 0) {
+      const relations = outlet_ids.map((outletId: string) => ({
+        merchant_id: merchantId,
+        outlet_id: outletId,
+      }));
+
+      const { error: relErr } = await supabase
+        .from("outlet_merchants")
+        .insert(relations as any);
+
+      if (relErr) throw relErr;
+    }
+    return newMerchant as Merchant;
   };
 
   const updateMerchant = async (
@@ -52,6 +77,7 @@ export const useMerchant = () => {
   ) => {
     if (!user.value) throw new Error("User not authenticated");
 
+    const { outlet_ids, ...merchantData } = payload;
     //existing image
     let imageUrl = payload.image_url as string | null;
 
@@ -77,11 +103,28 @@ export const useMerchant = () => {
       image_url: imageUrl,
     };
 
-    const { error } = await (supabase.from("merchants") as any)
+    const { error: dbError } = await (supabase.from("merchants") as any)
       .update(updateData)
       .eq("id", id);
 
-    if (error) throw error;
+    if (dbError) throw dbError;
+
+    if (outlet_ids) {
+      await supabase.from("outlet_merchants").delete().eq("merchant_id", id);
+
+      if (outlet_ids.length > 0) {
+        const relations = outlet_ids.map((outletId) => ({
+          merchant_id: id,
+          outlet_id: outletId,
+        }));
+
+        const { error: relErr } = await supabase
+          .from("outlet_merchants")
+          .insert(relations as any);
+
+        if (relErr) throw relErr;
+      }
+    }
   };
 
   const deleteMerchant = async (id: string) => {
@@ -115,10 +158,10 @@ export const useMerchant = () => {
 
   const fetchMerchants = async (params: {
     search?: string;
-    page: number;
-    limit: number;
+    page?: number;
+    limit?: number;
   }): Promise<{ data: Merchant[]; total: number }> => {
-    const { search, page, limit } = params;
+    const { search, page = 1, limit = 1000 } = params;
 
     const from = (page - 1) * limit;
     const to = from + limit - 1;
@@ -131,7 +174,9 @@ export const useMerchant = () => {
       address, 
       image_url, 
       is_active,
-      creator_name
+      profiles:created_by (fullname),
+      outlet_merchants (outlet_id,
+      outlets:outlet_id (name))
     `,
       {
         count: "exact",
@@ -141,7 +186,6 @@ export const useMerchant = () => {
     if (search) {
       query = query.or(`name.ilike.%${search}%`);
     }
-
     const { data, error, count } = await query
       .order("created_at", {
         ascending: true,
@@ -150,20 +194,51 @@ export const useMerchant = () => {
 
     if (error) throw error;
 
-    return { data, total: count || 0 };
+    const rawData = (data as unknown as MerchantResponse[]) || [];
+
+    const transformed: Merchant[] = rawData.map((m) => {
+      const { profiles, outlet_merchants, ...merchantData } = m;
+      return {
+        ...merchantData,
+        creator_name: profiles?.fullname ?? "Unknown",
+        outlet_merchants: outlet_merchants || [],
+      };
+    });
+    return { data: transformed, total: count || 0 };
   };
 
-  const fetchSimpleMerchants = async () => {
-    const { data, error } = await supabase
+  const fetchSimpleMerchants = async (isActive: boolean = false) => {
+    let query = supabase
       .from("merchants")
-      .select("id, name")
-      .order("created_at", {
-        ascending: true,
-      });
+      .select(
+        `id, name, image_url, products:products(count), outlet_merchants (
+        outlet_id,
+        outlets:outlet_id (name)
+      )`,
+      )
+      .filter("products.is_active", "eq", true);
+
+    if (isActive) {
+      query = query.eq("is_active", isActive);
+    }
+
+    const { data, error } = await query.order("created_at", {
+      ascending: true,
+    });
 
     if (error) throw error;
 
-    return (data as SimpleMerchants[]) ?? [];
+    return (data?.map((merchant: any) => ({
+      id: merchant.id,
+      name: merchant.name,
+      image_url: merchant.image_url,
+      product_count: merchant.products?.[0]?.count || 0,
+      outlets:
+        merchant.outlet_merchants?.map((om: any) => ({
+          id: om.outlet_id,
+          name: om.outlets?.name,
+        })) || [],
+    })) || []) as SimpleMerchants[];
   };
 
   return {

@@ -12,6 +12,14 @@ const { form, loading, imageFile } = useFormMerchant({
   merchant: props.merchant,
   onSuccess: () => emit("success"),
 });
+
+const { fetchOutlets } = useOutlet();
+const { data: outletsResponse, pending: outletPending } = useAsyncData(
+  "outlets-list",
+  () => fetchOutlets(),
+);
+
+const outlets = computed(() => outletsResponse.value?.data || []);
 </script>
 
 <template>
@@ -60,9 +68,7 @@ const { form, loading, imageFile } = useFormMerchant({
         <form.Field name="phone_number">
           <template #default="{ field }">
             <Field :data-invalid="isInvalid(field)">
-              <FieldLabel :for="field.name">
-                Phone number <span className="text-destructive">*</span>
-              </FieldLabel>
+              <FieldLabel :for="field.name"> Phone number </FieldLabel>
               <Input
                 :id="field.name"
                 :name="field.name"
@@ -81,7 +87,52 @@ const { form, loading, imageFile } = useFormMerchant({
           </template>
         </form.Field>
       </div>
-      <div class="sm:col-span-4">
+      <div class="space-y-4 sm:col-span-4">
+        <form.Field name="outlet_ids">
+          <template #default="{ field }">
+            <Field :data-invalid="isInvalid(field)">
+              <FieldLabel :for="field.name"> Outlet </FieldLabel>
+              <Select
+                multiple
+                :name="field.name"
+                :model-value="field.state.value || []"
+                @update:model-value="
+                  (val: any) => {
+                    field.handleChange(val);
+                  }
+                "
+              >
+                <SelectTrigger
+                  :id="field.name"
+                  :aria-invalid="isInvalid(field)"
+                >
+                  <SelectValue placeholder="Select outlet" />
+                </SelectTrigger>
+                <SelectContent position="item-aligned">
+                  <SelectGroup>
+                    <div
+                      v-if="outletPending"
+                      class="flex items-center justify-center py-2"
+                    >
+                      <Spinner />
+                    </div>
+                    <SelectItem
+                      v-for="outlet in outlets"
+                      :key="outlet.id"
+                      :value="outlet.id"
+                    >
+                      {{ outlet.name }}
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              <FieldError
+                v-if="isInvalid(field)"
+                :errors="[field.state.meta.errors[0]]"
+              />
+            </Field>
+          </template>
+        </form.Field>
         <form.Field name="address">
           <template #default="{ field }">
             <Field :data-invalid="isInvalid(field)">
