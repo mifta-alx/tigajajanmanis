@@ -188,7 +188,10 @@ const confirmDeleteMerchant = async () => {
       />
     </div>
     <Dialog v-model:open="isModalOpen">
-      <DialogContent class="sm:max-w-xl">
+      <DialogContent
+        class="sm:max-w-xl"
+        @interact-outside="(event) => event.preventDefault()"
+      >
         <DialogHeader>
           <DialogTitle>{{
             selectedMerchant ? "Edit Merchant" : "Add Merchant"

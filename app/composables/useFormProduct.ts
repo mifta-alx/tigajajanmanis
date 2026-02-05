@@ -6,7 +6,6 @@ export const useFormProduct = (props: {
   product?: Product | null;
   onSuccess: () => void;
 }) => {
-  const { uploadImage } = useUploadStorage();
   const { createProduct, updateProduct } = useProduct();
   const { success, error } = useToast();
   const loading = ref(false);

@@ -1,7 +1,6 @@
 import type { ColumnDef } from "@tanstack/vue-table";
 import type { Product } from "~/types/product";
 import { h } from "vue";
-import { NuxtImg } from "#components";
 import Switch from "~/components/Switch.vue";
 import { Button } from "~/components/ui/button";
 import { Icon } from "@iconify/vue";
@@ -13,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { formatPrice } from "~/lib/utils";
+import ImageWithFallback from "~/components/ImageWithFallback.vue";
 
 export const getColumns = (
   onDelete: (id: string) => void,
@@ -38,17 +38,23 @@ export const getColumns = (
           ? product.image_url
           : `https://placehold.co/32x32?text=${firstLetter}`;
       return h("div", { class: "flex items-center gap-2" }, [
-        h(NuxtImg as any, {
-          class: "size-8 rounded-sm object-cover",
+        h(ImageWithFallback, {
+          class: "size-8 rounded-sm",
+          imgClass: "size-8 rounded-sm",
+          skeletonClass: "size-8 rounded-sm",
           src: imageSrc,
           alt: product.name,
         }),
 
-        h("div", { class: "flex flex-col" }, [
-          h("p", { class: "text-sm font-medium" }, row.getValue("name")),
+        h("div", { class: "flex flex-col min-w-0" }, [
           h(
             "p",
-            { class: "text-xs font-normal text-muted-foreground" },
+            { class: "text-sm font-medium text-wrap" },
+            row.getValue("name"),
+          ),
+          h(
+            "p",
+            { class: "text-xs font-normal text-muted-foreground " },
             product.merchant_name,
           ),
         ]),
@@ -138,7 +144,7 @@ export const getColumns = (
     id: "actions",
     size: 40,
     cell: ({ row }) => {
-      const merchant = row.original;
+      const product = row.original;
 
       return h("div", { class: "flex items-center justify-end gap-2" }, [
         h(
@@ -177,14 +183,14 @@ export const getColumns = (
                     h(
                       DropdownMenuItem,
                       {
-                        onClick: () => onEdit(merchant),
+                        onClick: () => onEdit(product),
                       },
                       () => "Edit",
                     ),
                     h(DropdownMenuSeparator, {}),
                     h(
                       DropdownMenuItem,
-                      { onClick: () => onDelete(merchant.id) },
+                      { onClick: () => onDelete(product.id) },
                       () => "Delete",
                     ),
                   ],

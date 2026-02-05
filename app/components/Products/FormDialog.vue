@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { Product } from "~/types/product";
 import { isInvalid } from "~/lib/utils";
-import type { Role } from "~/types/role";
 
 const props = defineProps<{
   product?: Product | null;
@@ -60,7 +59,7 @@ const unformatPriceBase = (val: string) => {
               <Select
                 :name="field.name"
                 :model-value="field.state.value"
-                @update:model-value="(val) => field.handleChange(val as Role)"
+                @update:model-value="(val) => field.handleChange(val as string)"
               >
                 <SelectTrigger
                   :id="field.name"
