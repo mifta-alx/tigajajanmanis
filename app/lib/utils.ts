@@ -54,3 +54,18 @@ export const unformatPriceBase = (formattedPrice: string) => {
   const result = parseFloat(numeric);
   return isNaN(result) ? 0 : result;
 };
+
+export const formatTime = (dateStr: string) => {
+  return new Intl.DateTimeFormat("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+    .format(new Date(dateStr))
+    .replace(/\./g, ":");
+};
+
+export const getImage = (name: string, image: string) => {
+  if (image && image.trim() !== "") return image;
+  const firstLetter = name ? name.substring(0, 1).toUpperCase() : "P";
+  return `https://placehold.co/100x100?text=${firstLetter}`;
+};
