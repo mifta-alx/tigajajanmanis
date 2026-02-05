@@ -2,6 +2,7 @@ import type {
   CreateProductDTO,
   UpdateProductDTO,
   Product,
+  MerchantProduct,
 } from "~/types/product";
 import type { ProductEntity } from "~/types/models";
 
@@ -15,7 +16,6 @@ interface ProductResponse {
   sku: string;
   image_url: string;
   is_active: boolean;
-  creator_name: string;
   merchants: { name: string } | null;
 }
 
@@ -144,7 +144,6 @@ export const useProduct = () => {
       sku,
       image_url, 
       is_active,
-      creator_name,
       merchants:merchant_id (name)
     `,
       {
@@ -179,8 +178,49 @@ export const useProduct = () => {
     return { data: transformed, total: count || 0 };
   };
 
+  const fetchProductByMerchant = async (
+    merchantId: string | null | undefined,
+  ): Promise<MerchantProduct[]> => {
+    if (!merchantId) return [];
+
+    const { data, error } = await supabase
+      .from("products")
+      .select(
+        `
+      id, 
+      merchant_id,
+      name, 
+      cost_price, 
+      selling_price, 
+      stock, 
+      sku,
+      image_url,
+      merchants:merchant_id (name)
+    `,
+        {
+          count: "exact",
+        },
+      )
+      .eq("is_active", true)
+      .eq("merchant_id", merchantId)
+      .order("name", { ascending: true });
+
+    if (error) throw error;
+    const rawData = (data as unknown as ProductResponse[]) || [];
+
+    const transformed: MerchantProduct[] = rawData.map((m) => {
+      const { merchants, ...productData } = m;
+      return {
+        ...productData,
+        merchant_name: merchants?.name ?? "-",
+      };
+    });
+    return transformed;
+  };
+
   return {
     fetchProducts,
+    fetchProductByMerchant,
     toggleStatus,
     createProduct,
     updateProduct,

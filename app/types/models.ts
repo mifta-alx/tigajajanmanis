@@ -1,6 +1,7 @@
 import type { Role } from "~/types/role";
+export type StockLogType = "IN" | "OUT_SOLD" | "OUT_SETTLE" | "ADJUSTMENT";
 
-export interface Profile {
+export interface ProfileEntity {
   id: string;
   username: string;
   fullname: string;
@@ -8,6 +9,7 @@ export interface Profile {
   address: string | null;
   role: Role;
   is_active: boolean;
+  outlet_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -15,12 +17,11 @@ export interface Profile {
 export interface MerchantEntity {
   id: string;
   name: string;
-  phone_number: string;
+  phone_number: string | null;
   address: string | null;
   image_url: string | null;
   is_active: boolean;
   created_by: string;
-  creator_name: string;
   created_at: string;
   updated_at: string;
 }
@@ -36,7 +37,6 @@ export interface ProductEntity {
   image_url: string | null;
   is_active: boolean;
   created_by: string;
-  creator_name: string;
   created_at: string;
   updated_at: string;
 }
@@ -44,12 +44,21 @@ export interface ProductEntity {
 export interface StockEntity {
   id: string;
   merchant_id: string;
+  outlet_id: string;
   product_id: string;
   quantity: number;
   entry_date: string;
-  notes: string;
+  type: StockLogType;
   created_by: string;
-  creator_name: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OutletEntity {
+  id: string;
+  name: string;
+  address: string | null;
+  is_active: boolean;
   created_at: string;
   updated_at: string;
 }
