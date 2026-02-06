@@ -32,9 +32,20 @@ const availableOutlets = computed(() => {
 });
 
 watch(selectedMerchantId, (newId) => {
-  selectedOutletId.value = "";
   form.setFieldValue("merchant_id", newId);
-  form.setFieldValue("outlet_id", "");
+
+  const outlets = availableOutlets.value;
+  if (outlets && outlets.length === 1) {
+    const firstOutlet = outlets[0];
+    if (firstOutlet) {
+      selectedOutletId.value = firstOutlet.id;
+      form.setFieldValue("outlet_id", firstOutlet.id);
+    }
+  } else {
+    selectedOutletId.value = "";
+    form.setFieldValue("outlet_id", "");
+  }
+
   form.setFieldMeta("outlet_id", (prev) => ({
     ...prev,
     errors: [],
@@ -124,6 +135,7 @@ const getImage = (name: string, image: string) => {
         </template>
       </form.Field>
       <form.Field
+        v-if="availableOutlets.length > 1"
         name="outlet_id"
         :validators="{
           onChange: z.string().min(1, 'Please select a outlet'),

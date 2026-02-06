@@ -18,7 +18,7 @@ export const getColumns = (
 ): ColumnDef<Stock>[] => [
   {
     accessorKey: "product_name",
-    size: 200,
+    size: 280,
     header: () => h("div", { class: "text-left px-2" }, "Item"),
     cell: ({ row }) => {
       const stock = row.original;
