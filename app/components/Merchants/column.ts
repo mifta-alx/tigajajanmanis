@@ -2,6 +2,7 @@ import { h } from "vue";
 import type { ColumnDef } from "@tanstack/vue-table";
 import type { Merchant } from "~/types/merchant";
 import { Button } from "~/components/ui/button";
+import { Badge } from "~/components/ui/badge";
 import Switch from "~/components/Switch.vue";
 import {
   DropdownMenu,
@@ -38,7 +39,7 @@ export const getColumns = (
           : `https://placehold.co/32x32?text=${firstLetter}`;
       return h("div", { class: "flex items-center gap-2" }, [
         h(ImageWithFallback, {
-          class: "size-8 rounded-sm",
+          class: "size-8 rounded-sm shrink-0",
           imgClass: "size-8 rounded-sm",
           skeletonClass: "size-8 rounded-sm",
           src: imageSrc,
@@ -64,15 +65,14 @@ export const getColumns = (
 
       return h(
         "div",
-        { class: "flex flex-wrap gap-1" },
+        { class: "flex flex-wrap gap-1.5" },
         names.map((name) =>
           h(
-            "span",
+            Badge,
             {
-              class:
-                "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800",
+              variant: "outline",
             },
-            name,
+            () => name,
           ),
         ),
       );

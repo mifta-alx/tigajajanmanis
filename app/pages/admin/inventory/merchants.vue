@@ -8,13 +8,7 @@ import { refDebounced } from "@vueuse/core";
 definePageMeta({
   layout: "admin",
   middleware: ["auth"],
-});
-
-useSeoMeta({
-  title: "TigaJajan POS | Inventory > Merchants",
-  ogTitle: "TigaJajan POS | Inventory > Merchants",
-  description: "",
-  ogDescription: "",
+  title: "Inventory > Merchants",
 });
 
 const isModalOpen = ref(false);

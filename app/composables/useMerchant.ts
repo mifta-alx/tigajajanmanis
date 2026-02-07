@@ -207,11 +207,15 @@ export const useMerchant = () => {
     return { data: transformed, total: count || 0 };
   };
 
-  const fetchSimpleMerchants = async (isActive: boolean = false) => {
+  const fetchSimpleMerchants = async (
+    isActive: boolean = false,
+    outletId?: string,
+  ) => {
     let query = supabase
       .from("merchants")
       .select(
-        `id, name, image_url, products:products(count), outlet_merchants (
+        `id, name, image_url, products:products(count), 
+        outlet_merchants!inner (
         outlet_id,
         outlets:outlet_id (name)
       )`,
@@ -220,6 +224,10 @@ export const useMerchant = () => {
 
     if (isActive) {
       query = query.eq("is_active", isActive);
+    }
+
+    if (outletId) {
+      query = query.eq("outlet_merchants.outlet_id", outletId);
     }
 
     const { data, error } = await query.order("created_at", {
