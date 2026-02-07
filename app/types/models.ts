@@ -1,5 +1,10 @@
 import type { Role } from "~/types/role";
-export type StockLogType = "IN" | "OUT_SOLD" | "OUT_SETTLE" | "ADJUSTMENT";
+export type StockLogType =
+  | "ALL"
+  | "IN"
+  | "OUT_SOLD"
+  | "OUT_SETTLE"
+  | "ADJUSTMENT";
 
 export interface ProfileEntity {
   id: string;
@@ -32,7 +37,6 @@ export interface ProductEntity {
   name: string;
   cost_price: number;
   selling_price: number;
-  stock: number;
   sku: string;
   image_url: string | null;
   is_active: boolean;

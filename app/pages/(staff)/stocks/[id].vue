@@ -9,13 +9,8 @@ definePageMeta({
   title: "Tambah Stok",
 });
 
-useSeoMeta({
-  title: "TigaJajan POS | Stocks",
-  ogTitle: "TigaJajan POS | Stocks",
-  description: "",
-  ogDescription: "",
-});
-
+const user = useSupabaseUser();
+const outletId = computed(() => user.value?.user_metadata?.outlet_id || "-");
 const { fetchProductByMerchant } = useProduct();
 const selectedMerchant = route.params.id as string;
 const { addBulkStock } = useStock();
@@ -28,7 +23,7 @@ const products = useState<MerchantProduct[]>(
 
 const { pending, error } = useLazyAsyncData(
   `products-data-${selectedMerchant}`,
-  () => fetchProductByMerchant(selectedMerchant),
+  () => fetchProductByMerchant(selectedMerchant, outletId.value),
   {
     transform: (data) => {
       products.value = data;
@@ -84,71 +79,146 @@ const handleSave = async () => {
 </script>
 
 <template>
-  <div class="pb-28">
-    <div class="flex flex-col gap-4">
-      <div
-        v-for="i in 10"
-        :key="i"
-        class="flex items-center justify-between gap-2"
-        role="status"
-        aria-busy="true"
-      >
-        <div class="flex items-start gap-2.5">
-          <Skeleton class="size-20 rounded-lg" />
-          <div class="space-y-1.5 mt-1">
-            <Skeleton class="h-6 w-16 rounded-sm" />
-            <Skeleton class="h-2 w-28 rounded-sm" />
-            <Skeleton class="h-5 w-20 mt-4 rounded-sm" />
-          </div>
-        </div>
-        <Skeleton class="h-8 w-8 rounded-full" />
+  <div class="space-y-6 pb-32">
+    <div class="px-1 pt-2 flex items-end justify-between">
+      <div class="space-y-0.5">
+        <p
+          class="text-[10px] font-bold uppercase tracking-[0.2em] text-primary"
+        >
+          Update Stok
+        </p>
+        <h2 class="text-xl font-bold tracking-tight">Katalog Produk</h2>
       </div>
+      <div
+        class="bg-secondary/50 px-3 py-1 rounded-full border border-border/50"
+      >
+        <p class="text-[10px] font-bold text-muted-foreground uppercase">
+          {{ products.length }} SKU
+        </p>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 gap-4">
+      <template v-if="pending && products.length === 0">
+        <div
+          v-for="i in 5"
+          :key="i"
+          class="h-24 rounded-[1.5rem] bg-muted animate-pulse"
+        ></div>
+      </template>
+
       <div
         v-for="(p, index) in products"
         :key="p.id"
-        class="flex items-center justify-between gap-2"
+        class="group flex items-center gap-3.5 p-2 bg-card rounded-[2rem] border border-border/50 shadow-sm transition-all duration-300"
       >
-        <div class="flex items-start gap-2.5">
+        <div
+          class="relative size-24 shrink-0 overflow-hidden rounded-[1.5rem] bg-muted"
+        >
           <ImageWithFallback
             :src="getImage(p.name, p.image_url)"
             :alt="p.name"
-            class="size-20 rounded-lg"
-            imgClass="size-20 rounded-lg object-cover"
-            skeletonClass="size-20 rounded-lg"
+            imgClass="size-full object-cover group-hover:scale-110 transition-transform duration-500"
+            skeletonClass="size-full"
           />
-          <div>
-            <p class="text-base font-semibold leading-tight">{{ p.name }}</p>
-            <p class="text-xs text-muted-foreground">
-              Stok saat ini : {{ p.stock }}
-            </p>
-            <p class="text-base mt-1 font-medium">
-              {{ formatPrice(p.selling_price) }}
+          <div
+            class="absolute bottom-2 right-2 bg-background/90 backdrop-blur-md px-2 py-0.5 rounded-lg border border-border/50"
+          >
+            <p class="text-[9px] font-black uppercase tracking-tighter">
+              {{ p.current_stock }} <span class="opacity-50">Sisa</span>
             </p>
           </div>
         </div>
-        <CustomNumberField v-model="stockInput[p.id]" />
+
+        <div class="flex-1 min-w-0 flex flex-col justify-between h-full py-1.5">
+          <div>
+            <h3
+              class="text-base font-semibold leading-tight tracking-tight text-foreground line-clamp-2"
+            >
+              {{ p.name }}
+            </h3>
+          </div>
+
+          <div class="flex items-end justify-between">
+            <p class="text-sm font-semibold text-primary/80">
+              {{ formatPrice(p.selling_price) }}
+            </p>
+
+            <div class="origin-right -mb-1">
+              <CustomNumberField v-model="stockInput[p.id]" />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div
-      class="fixed bottom-0 left-0 right-0 p-4 bg-background flex flex-col gap-2 z-20 border-t-0"
-    >
+    <div class="fixed bottom-0 left-0 right-0 p-6 z-40 pointer-events-none">
       <div
-        v-if="Object.values(stockInput).some((v) => v > 0)"
-        class="text-center text-xs text-muted-foreground animate-in fade-in slide-in-from-bottom-1"
+        class="max-w-md mx-auto pointer-events-auto flex flex-col items-center"
       >
-        {{ Object.values(stockInput).filter((v) => v > 0).length }} Produk akan
-        diperbarui
+        <Transition
+          enter-active-class="transition duration-300 ease-out"
+          enter-from-class="transform translate-y-2 opacity-0 scale-95"
+          enter-to-class="transform translate-y-0 opacity-100 scale-100"
+          leave-active-class="transition duration-200 ease-in"
+          leave-from-class="transform translate-y-0 opacity-100 scale-100"
+          leave-to-class="transform translate-y-2 opacity-0 scale-95"
+        >
+          <div
+            v-if="Object.values(stockInput).some((v) => v > 0)"
+            class="mb-3 w-full"
+          >
+            <div
+              class="bg-accent-foreground/90 backdrop-blur-md text-background px-4 py-2.5 rounded-[1.2rem] shadow-2xl border border-white/10 flex items-center justify-between"
+            >
+              <div class="flex items-center gap-3">
+                <div class="flex flex-col">
+                  <span
+                    class="text-[8px] font-medium uppercase text-muted/50 tracking-widest leading-none mb-1"
+                    >Total Produk</span
+                  >
+                  <span
+                    class="text-[11px] font-bold uppercase tracking-tight leading-none"
+                  >
+                    {{ Object.values(stockInput).filter((v) => v > 0).length }}
+                    Produk
+                  </span>
+                </div>
+
+                <div class="h-6 w-px bg-white/20"></div>
+
+                <div class="flex flex-col">
+                  <span
+                    class="text-[8px] font-medium uppercase text-muted/50 tracking-widest leading-none mb-1"
+                    >Total Stok</span
+                  >
+                  <span
+                    class="text-[11px] font-bold uppercase tracking-tight leading-none"
+                  >
+                    {{ Object.values(stockInput).reduce((a, b) => a + b, 0) }}
+                    Pcs
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Transition>
+
+        <button
+          @click="handleSave"
+          :disabled="
+            isSubmitting || !Object.values(stockInput).some((v) => v > 0)
+          "
+          class="group relative w-full h-12 rounded-xl bg-foreground text-background transition-all active:scale-[0.97] disabled:opacity-20 disabled:grayscale overflow-hidden shadow-xl"
+        >
+          <div class="relative z-10 flex items-center justify-center gap-3">
+            <Spinner v-if="isSubmitting" class="size-4 text-background" />
+            <span v-else class="text-sm font-semibold"> Konfirmasi </span>
+          </div>
+
+          <div
+            class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
+          ></div>
+        </button>
       </div>
-      <button
-        @click="handleSave"
-        :disabled="
-          isSubmitting || !Object.values(stockInput).some((v) => v > 0)
-        "
-        class="w-full bg-sidebar-accent-foreground text-sidebar py-3 rounded-full font-semibold active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-      >
-        <Spinner v-if="isSubmitting" />
-        {{ isSubmitting ? "Memproses..." : "Konfirmasi" }}
-      </button>
     </div>
   </div>
 </template>

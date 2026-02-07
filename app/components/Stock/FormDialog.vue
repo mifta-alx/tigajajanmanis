@@ -55,10 +55,13 @@ watch(selectedMerchantId, (newId) => {
 });
 
 const { data: products, pending: productPending } = useLazyAsyncData(
-  () => `products-${selectedMerchantId.value}`,
+  () => `products-${selectedMerchantId.value}-${selectedOutletId.value}`,
   async () => {
-    if (!selectedMerchantId.value) return [];
-    const data = await fetchProductByMerchant(selectedMerchantId.value);
+    if (!selectedMerchantId.value || !selectedOutletId.value) return [];
+    const data = await fetchProductByMerchant(
+      selectedMerchantId.value,
+      selectedOutletId.value,
+    );
 
     form.setFieldValue(
       "items",
@@ -71,7 +74,7 @@ const { data: products, pending: productPending } = useLazyAsyncData(
     return data;
   },
   {
-    watch: [selectedMerchantId],
+    watch: [selectedMerchantId, selectedOutletId],
   },
 );
 
@@ -151,7 +154,12 @@ const getImage = (name: string, image: string) => {
               :name="field.name"
               :model-value="field.state.value"
               :disabled="!selectedMerchantId"
-              @update:model-value="(val) => field.handleChange(val as string)"
+              @update:model-value="
+                (val) => {
+                  field.handleChange(val as string);
+                  selectedOutletId = val as string;
+                }
+              "
             >
               <SelectTrigger :id="field.name" :aria-invalid="isInvalid(field)">
                 <SelectValue
@@ -233,7 +241,7 @@ const getImage = (name: string, image: string) => {
               {{ p.sku }}
             </p>
             <p class="text-xs text-muted-foreground">
-              Current Stock : {{ p.stock }}
+              Current Stock : {{ p.current_stock }}
             </p>
           </div>
         </div>

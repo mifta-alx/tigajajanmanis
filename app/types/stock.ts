@@ -7,14 +7,12 @@ export type CreateStockDTO = Omit<
 
 export type UpdateStockDTO = Partial<CreateStockDTO>;
 
-export interface Stock extends Omit<
-  StockEntity,
-  "outlet_id" | "merchant_id" | "created_by" | "updated_at"
-> {
+export interface Stock extends Omit<StockEntity, "created_by" | "updated_at"> {
   merchant_name: string;
   outlet_name: string;
   product_name: string;
   creator_name: string;
   sku: string;
   image_url: string | null;
+  current_stock?: number;
 }

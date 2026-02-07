@@ -29,7 +29,7 @@ export const getColumns = (
           : `https://placehold.co/32x32?text=${firstLetter}`;
       return h("div", { class: "flex items-center gap-2 px-2" }, [
         h(ImageWithFallback, {
-          class: "size-8 rounded-sm",
+          class: "size-8 rounded-sm shrink-0",
           imgClass: "size-8 rounded-sm",
           skeletonClass: "size-8 rounded-sm",
           src: imageSrc,
@@ -44,7 +44,7 @@ export const getColumns = (
           ),
           h(
             "p",
-            { class: "text-xs font-normal text-muted-foreground" },
+            { class: "text-xs font-normal text-muted-foreground text-wrap" },
             stock.merchant_name,
           ),
         ]),

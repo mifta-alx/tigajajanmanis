@@ -8,13 +8,7 @@ import type { Stock } from "~/types/stock";
 definePageMeta({
   layout: "admin",
   middleware: ["auth"],
-});
-
-useSeoMeta({
-  title: "TigaJajan POS | Workflows > Stock In",
-  ogTitle: "TigaJajan POS | Workflows > Stock In",
-  description: "",
-  ogDescription: "",
+  title: "Workflows > Stock In",
 });
 
 const isModalOpen = ref(false);
@@ -38,6 +32,7 @@ const {
     fetchStock({
       filterDate: filterDate.value || "",
       search: debouncedSearch.value || "",
+      type: "IN",
     }),
   {
     watch: [debouncedSearch, filterDate],
