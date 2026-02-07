@@ -7,13 +7,7 @@ import type { User } from "~/types/profiles";
 definePageMeta({
   layout: "admin",
   middleware: ["auth"],
-});
-
-useSeoMeta({
-  title: "TigaJajan POS | Users",
-  ogTitle: "TigaJajan POS | Users",
-  description: "",
-  ogDescription: "",
+  title: "Users",
 });
 
 const user = useSupabaseUser();

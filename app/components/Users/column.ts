@@ -68,11 +68,7 @@ export const getColumns = (
       const roleValue = row.getValue("role") as string;
 
       return h("div", { class: "flex items-center justify-center gap-1" }, [
-        h(
-          Badge,
-          { variant: "secondary", class: "capitalize" },
-          { default: () => roleValue },
-        ),
+        h(Badge, { class: "capitalize" }, { default: () => roleValue }),
       ]);
     },
   },
