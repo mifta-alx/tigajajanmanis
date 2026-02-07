@@ -1,33 +1,21 @@
 <script setup lang="ts">
 const route = useRoute();
 
-const pageTitle = computed(() => {
-  if (route.meta.title) {
-    return route.meta.title as string;
-  }
-
-  return "Menu";
+useSeoMeta({
+  title: `TigaJajan POS | ${route.meta.title}`,
+  ogTitle: `TigaJajan POS | ${route.meta.title}`,
+  description: "",
+  ogDescription: "",
 });
 </script>
 
 <template>
   <div class="min-h-screen bg-background flex justify-center">
-    <NavHeader>
-      <div class="flex items-center flex-1 relative">
-        <button
-          @click="$router.back()"
-          class="flex items-center justify-center -ml-1 active:scale-80 transition-transform duration-300 absolute top-0 bottom-0 right-0"
-        >
-          <Icon name="lucide:search" class="size-5" />
-        </button>
-        <div class="flex-1 flex items-center justify-center">
-          <h1 class="font-medium text-xl tracking-tight text-center">
-            {{ pageTitle }}
-          </h1>
-        </div>
-      </div>
-    </NavHeader>
-    <main class="w-full lg:max-w-xl px-6 pt-16 pb-20">
+    <NavHeader v-if="!route.meta.hideHeader" />
+    <main
+      class="w-full lg:max-w-xl px-6 pb-24"
+      :class="!route.meta.hideHeader ? 'pt-24' : 'pt-6'"
+    >
       <slot />
     </main>
     <AppBottomNav />

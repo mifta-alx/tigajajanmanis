@@ -25,14 +25,14 @@ const decrement = () => {
     <div
       class="flex flex-row-reverse items-center transition-all duration-300 ease-in-out rounded-full overflow-hidden"
       :class="
-        currentVal > 0 ? 'bg-gray-100 p-1 shadow-inner' : 'bg-transparent'
+        currentVal > 0 ? 'bg-secondary/80 p-1 shadow-inner' : 'bg-transparent'
       "
     >
       <button
         @click="increment"
-        class="bg-sidebar-accent-foreground rounded-full size-8 flex items-center justify-center text-sidebar active:scale-90 transition-all duration-300 shadow-sm shrink-0 z-10"
+        class="bg-foreground rounded-full size-8 flex items-center justify-center text-background active:scale-90 transition-all duration-300 shadow-sm shrink-0 z-10"
       >
-        <Icon name="lucide:plus" class="size-4" />
+        <Icon name="lucide:plus" class="size-4 stroke-[3px]" />
       </button>
 
       <div
@@ -41,9 +41,9 @@ const decrement = () => {
       >
         <button
           @click="decrement"
-          class="bg-white rounded-full size-8 text-sidebar-accent-foreground flex items-center justify-center shadow-sm active:scale-75 shrink-0"
+          class="bg-background text-foreground border border-border rounded-full size-8 flex items-center justify-center shadow-sm active:scale-90 shrink-0 transition-all duration-300"
         >
-          <Icon name="lucide:minus" class="size-4" />
+          <Icon name="lucide:minus" class="size-4 stroke-[3px]" />
         </button>
 
         <input

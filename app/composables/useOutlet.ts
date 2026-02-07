@@ -2,6 +2,31 @@ import type { CreateOutletDTO, Outlet, UpdateOutletDTO } from "~/types/outlet";
 
 export const useOutlet = () => {
   const supabase = useSupabaseClient();
+  const activeOutlet = useState<any | null>("active-outlet", () => null);
+
+  const fetchActiveOutlet = async (outletId: string) => {
+    const { data, error } = await supabase
+      .from("outlets")
+      .select("id, name, address, is_open")
+      .eq("id", outletId)
+      .single();
+
+    if (error) throw error;
+    activeOutlet.value = data;
+    return data;
+  };
+
+  const toggleStatusOpen = async (newStatus: boolean) => {
+    if (!activeOutlet.value?.id) return;
+    const outletId = activeOutlet.value.id;
+
+    const { error: dbError } = await (supabase.from("outlets") as any)
+      .update({ is_open: newStatus })
+      .eq("id", outletId);
+
+    if (dbError) throw dbError;
+    activeOutlet.value.is_open = newStatus;
+  };
 
   const createOutlet = async (payload: CreateOutletDTO) => {
     const insertData: CreateOutletDTO = {
@@ -49,6 +74,14 @@ export const useOutlet = () => {
     if (dbError) throw dbError;
   };
 
+  // const toggleStatusOpen = async (outletId: string, newStatus: boolean) => {
+  //   const { error: dbError } = await (supabase.from("outlets") as any)
+  //     .update({ is_open: newStatus })
+  //     .eq("id", outletId);
+  //
+  //   if (dbError) throw dbError;
+  // };
+
   const fetchOutlets = async (
     params: {
       search?: string;
@@ -91,5 +124,8 @@ export const useOutlet = () => {
     deleteOutlet,
     fetchOutlets,
     toggleStatus,
+    toggleStatusOpen,
+    activeOutlet,
+    fetchActiveOutlet,
   };
 };
