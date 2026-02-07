@@ -11,6 +11,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
 import { formatPrice } from "~/lib/utils";
 import ImageWithFallback from "~/components/ImageWithFallback.vue";
 
@@ -39,7 +45,7 @@ export const getColumns = (
           : `https://placehold.co/32x32?text=${firstLetter}`;
       return h("div", { class: "flex items-center gap-2" }, [
         h(ImageWithFallback, {
-          class: "size-8 rounded-sm",
+          class: "size-8 rounded-sm shrink-0",
           imgClass: "size-8 rounded-sm",
           skeletonClass: "size-8 rounded-sm",
           src: imageSrc,
@@ -54,7 +60,7 @@ export const getColumns = (
           ),
           h(
             "p",
-            { class: "text-xs font-normal text-muted-foreground " },
+            { class: "text-xs font-normal text-muted-foreground text-wrap" },
             product.merchant_name,
           ),
         ]),
@@ -113,12 +119,37 @@ export const getColumns = (
     accessorKey: "stock",
     size: 64,
     header: () => h("div", { class: "text-center" }, "Stock"),
-    cell: ({ row }) =>
-      h(
-        "div",
-        { class: "text-center text-muted-foreground" },
-        row.getValue("stock"),
-      ),
+    cell: ({ row }) => {
+      const stockValue = row.getValue("stock") as number;
+      const inventoryDetails = row.original.inventory_details || [];
+
+      return h("div", { class: "text-center" }, [
+        h(TooltipProvider, { delayDuration: 0 }, () => [
+          h(Tooltip, {}, () => [
+            h(TooltipTrigger, { asChild: true }, () =>
+              h(
+                "span",
+                {
+                  class: "cursor-help font-medium text-muted-foreground",
+                },
+                stockValue,
+              ),
+            ),
+            h(TooltipContent, {}, () =>
+              inventoryDetails.length > 0
+                ? inventoryDetails.map((loc: any) =>
+                    h(
+                      "div",
+                      { key: loc.outlet_name, class: "text-xs" },
+                      `${loc.outlet_name}: ${loc.qty}`,
+                    ),
+                  )
+                : h("div", { class: "text-xs" }, "No details available"),
+            ),
+          ]),
+        ]),
+      ]);
+    },
   },
   {
     accessorKey: "status",

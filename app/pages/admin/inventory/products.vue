@@ -8,13 +8,7 @@ import DeleteDialog from "~/components/DeleteDialog.vue";
 definePageMeta({
   layout: "admin",
   middleware: ["auth"],
-});
-
-useSeoMeta({
-  title: "TigaJajan POS | Inventory > Products",
-  ogTitle: "TigaJajan POS | Inventory > Products",
-  description: "",
-  ogDescription: "",
+  title: "Inventory > Products",
 });
 
 const isModalOpen = ref(false);
@@ -204,7 +198,6 @@ const confirmDeleteProduct = async () => {
             }}
           </DialogDescription>
         </DialogHeader>
-
         <ProductsFormDialog
           v-if="isModalOpen"
           :product="selectedProduct"

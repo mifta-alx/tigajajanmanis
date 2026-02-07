@@ -2,7 +2,7 @@ import type { ProductEntity } from "./models";
 
 export type CreateProductDTO = Omit<
   ProductEntity,
-  "id" | "is_active" | "sku" | "stock" | "created_at" | "updated_at"
+  "id" | "is_active" | "sku" | "created_at" | "updated_at"
 >;
 
 export type UpdateProductDTO = Partial<CreateProductDTO>;
@@ -13,6 +13,11 @@ export interface Product extends Omit<
 > {
   profit: number;
   merchant_name: string;
+  stock: number;
+  inventory_details?: {
+    outlet_name: string;
+    qty: number;
+  }[];
 }
 
 export interface MerchantProduct {
@@ -22,7 +27,7 @@ export interface MerchantProduct {
   name: string;
   cost_price: number;
   selling_price: number;
-  stock: number;
   sku: string;
   image_url: string;
+  current_stock: number;
 }
