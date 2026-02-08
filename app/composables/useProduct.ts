@@ -217,8 +217,7 @@ export const useProduct = () => {
         `
       id, 
       merchant_id,
-      name, 
-      cost_price, 
+      name,
       selling_price, 
       sku,
       image_url,
@@ -255,7 +254,7 @@ export const useProduct = () => {
     outletId: string,
   ): Promise<Omit<MerchantProduct, "cost_price">[]> => {
     if (!outletId) return [];
-
+    const today = new Date().toISOString().split("T")[0] as string;
     // 1. Ambil list merchant_id yang terdaftar di outlet ini
     const { data: connectedMerchants } = await supabase
       .from("outlet_merchants")
@@ -280,11 +279,17 @@ export const useProduct = () => {
       merchants:merchant_id (name),
       outlet_stocks!inner (
         stock
+      ),
+      stock_logs!inner (
+        id
       )
     `,
       )
       .in("merchant_id", merchantIds)
       .eq("outlet_stocks.outlet_id", outletId)
+      .gt("outlet_stocks.stock", 0)
+      .eq("stock_logs.entry_date", today)
+      .eq("stock_logs.type", "IN")
       .eq("is_active", true)
       .order("name", { ascending: true });
 

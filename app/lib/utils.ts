@@ -46,6 +46,14 @@ export const formatPrice = (price: number) => {
   }).format(price);
 };
 
+export const formatNumberPrice = (price: number) => {
+  return new Intl.NumberFormat("id-ID", {
+    style: "decimal",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(price);
+};
+
 export const unformatPriceBase = (formattedPrice: string) => {
   if (!formattedPrice) return 0;
   let numeric = formattedPrice.replace(/[^0-9,-]+/g, "");

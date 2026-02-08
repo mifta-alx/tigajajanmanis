@@ -25,7 +25,6 @@ export interface MerchantProduct {
   merchant_id: string;
   merchant_name: string;
   name: string;
-  cost_price: number;
   selling_price: number;
   sku: string;
   image_url: string;
