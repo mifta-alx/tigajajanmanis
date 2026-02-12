@@ -8,7 +8,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     await fetchActiveOutlet(outletId);
   }
 
-  if (!activeOutlet.value || !activeOutlet.value.is_open) {
-    return navigateTo("/outlet");
-  }
+  // if (!activeOutlet.value || !activeOutlet.value.is_open) {
+  //   return navigateTo("/outlet");
+  // }
 });

@@ -59,8 +59,8 @@ const { data: products, pending: productPending } = useLazyAsyncData(
   async () => {
     if (!selectedMerchantId.value || !selectedOutletId.value) return [];
     const data = await fetchProductByMerchant(
-      selectedMerchantId.value,
       selectedOutletId.value,
+      selectedMerchantId.value,
     );
 
     form.setFieldValue(
@@ -212,13 +212,13 @@ const getImage = (name: string, image: string) => {
           aria-busy="true"
         >
           <div class="flex items-center gap-4">
-            <Skeleton class="size-12 rounded-md" />
+            <Skeleton class="size-12 rounded-md bg-muted" />
             <div class="space-y-1.5">
-              <Skeleton class="h-4 w-16 rounded-sm" />
-              <Skeleton class="h-2 w-28 rounded-sm" />
+              <Skeleton class="h-4 w-16 rounded-sm bg-muted" />
+              <Skeleton class="h-2 w-28 rounded-sm bg-muted" />
             </div>
           </div>
-          <Skeleton class="h-8 w-32 rounded-md" />
+          <Skeleton class="h-8 w-32 rounded-md bg-muted" />
         </div>
       </div>
       <div

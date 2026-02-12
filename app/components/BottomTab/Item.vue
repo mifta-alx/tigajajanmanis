@@ -20,9 +20,9 @@ const isActive = computed(() => {
   <NuxtLink
     :to="href"
     :class="{
-      'text-sidebar-accent-foreground!': isActive,
+      'text-primary!': isActive,
     }"
-    class="flex flex-col items-center justify-center w-full h-full text-sidebar-primary/80 dark:text-muted-foreground/60 gap-1.5"
+    class="flex flex-col items-center justify-center w-full h-full text-foreground/80 dark:text-muted-foreground/60 gap-1.5"
   >
     <Icon :name="`lucide:${icon}`" class="size-6" />
     <span class="text-xs">

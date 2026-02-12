@@ -1,11 +1,10 @@
 <script setup lang="ts">
 const route = useRoute();
 
-useSeoMeta({
-  title: `TigaJajan POS Admin | ${route.meta.title}`,
-  ogTitle: `TigaJajan POS Admin | ${route.meta.title}`,
-  description: "",
-  ogDescription: "",
+const pageTitle = computed(() => route.meta.title || "");
+
+useHead({
+  title: computed(() => `TigaJajan POS Admin | ${pageTitle.value}`),
 });
 </script>
 

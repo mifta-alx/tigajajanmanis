@@ -1,6 +1,8 @@
 import type { ClassValue } from "clsx";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -77,3 +79,7 @@ export const getImage = (name: string, image: string) => {
   const firstLetter = name ? name.substring(0, 1).toUpperCase() : "P";
   return `https://placehold.co/100x100?text=${firstLetter}`;
 };
+
+export function formatDate(date: Date, dateFormat = "MMM dd, yyyy") {
+  return format(date, dateFormat, { locale: id });
+}

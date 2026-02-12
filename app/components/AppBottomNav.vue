@@ -6,8 +6,8 @@ const items = [
     icon: "cake-slice",
   },
   {
-    title: "Stok",
-    url: "/stocks",
+    title: "Inventaris",
+    url: "/inventory",
     icon: "package-2",
   },
   {
@@ -17,7 +17,7 @@ const items = [
   },
   {
     title: "Outlet",
-    url: "/outlet",
+    url: "/outlets",
     icon: "store",
   },
 ];

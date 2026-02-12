@@ -33,13 +33,13 @@ const indicatorStyle = computed(() => {
 
 <template>
   <nav
-    class="fixed bottom-0 left-0 right-0 z-50 shadow-lg bg-sidebar p-3 flex items-center justify-center"
+    class="fixed bottom-0 left-0 right-0 z-30 shadow-lg bg-sidebar p-3 flex items-center justify-center"
   >
     <div
       class="relative flex flex-row items-center justify-around w-full max-w-lg"
     >
       <div
-        class="absolute top-[-12px] h-[2px] bg-accent-foreground transition-all duration-300 ease-in-out"
+        class="absolute top-[-12px] h-[2px] bg-primary transition-all duration-300 ease-in-out"
         :style="indicatorStyle"
       />
       <slot />

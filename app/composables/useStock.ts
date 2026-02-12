@@ -1,4 +1,11 @@
-import type { CreateStockDTO, Stock, UpdateStockDTO } from "~/types/stock";
+import type {
+  CreateStockDTO,
+  SettlementGroupedItem,
+  SettlementProduct,
+  Stock,
+  StockLogRaw,
+  UpdateStockDTO,
+} from "~/types/stock";
 import type { StockLogType } from "~/types/models";
 
 interface StockResponse {
@@ -180,11 +187,149 @@ export const useStock = () => {
     return { data: transformed, total: count || 0 };
   };
 
+  const checkExistingStock = async (outletId: string, merchantId: string) => {
+    const today = new Date().toISOString().split("T")[0];
+    const { data: currentBalances } = await supabase
+      .from("outlet_stocks")
+      .select(
+        `
+      stock,
+      products!inner(merchant_id, merchants(name))
+    `,
+      )
+      .eq("outlet_id", outletId)
+      .eq("products.merchant_id", merchantId)
+      .gt("stock", 0);
+
+    const merchantName =
+      (currentBalances as any)?.[0]?.products?.merchants?.name || null;
+
+    const hasPhysicalStock = currentBalances && currentBalances.length > 0;
+
+    if (!hasPhysicalStock) {
+      return { hasStock: false };
+    }
+
+    const { data: inputToday } = await supabase
+      .from("stock_logs")
+      .select("id")
+      .eq("outlet_id", outletId)
+      .eq("merchant_id", merchantId)
+      .eq("type", "IN")
+      .gte("entry_date", today)
+      .limit(1);
+
+    const alreadyInputToday = inputToday && inputToday.length > 0;
+
+    return {
+      hasStock: hasPhysicalStock && !alreadyInputToday,
+      merchantName,
+      error: null,
+    };
+  };
+
+  const fetchSettlementWorklist = async (params: {
+    outletId: string;
+    merchantId: string;
+  }): Promise<{ data: SettlementProduct[]; total: number }> => {
+    const { outletId, merchantId } = params;
+
+    if (!outletId || !merchantId) return { data: [], total: 0 };
+
+    // 1. Cari kapan terakhir kali Sesi benar-benar ditutup (OUT_SETTLE)
+    const { data } = await supabase
+      .from("stock_logs")
+      .select("entry_date")
+      .eq("outlet_id", outletId)
+      .eq("merchant_id", merchantId)
+      .eq("type", "OUT_SETTLE")
+      .order("entry_date", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    // 2. Tarik data logs
+    let query = supabase
+      .from("stock_logs")
+      .select(
+        `
+      product_id,
+      quantity,
+      type,
+      entry_date,
+      products:product_id (name, sku, image_url, selling_price),
+      merchants:merchant_id (name)
+    `,
+      )
+      .eq("outlet_id", outletId)
+      .eq("merchant_id", merchantId);
+
+    // 2. Tarik log mulai dari tanggal terakhir titip
+    const lastSettle = data as { entry_date: string } | null;
+    if (lastSettle?.entry_date) {
+      query = query.gt("entry_date", lastSettle.entry_date);
+    }
+
+    const { data: logs, error } = await query;
+
+    if (error) throw error;
+
+    const rawData = (logs as unknown as StockLogRaw[]) || [];
+
+    // 3. Kalkulasi sisa stok & simpan total_sold
+    const grouped = rawData.reduce(
+      (acc, curr) => {
+        const pId = curr.product_id;
+
+        if (!acc[pId]) {
+          acc[pId] = {
+            product_id: pId,
+            entry_date: curr.entry_date,
+            product_name: curr.products?.name ?? "Unknown",
+            selling_price: curr.products?.selling_price ?? 0,
+            sku: curr.products?.sku ?? "-",
+            image_url: curr.products?.image_url,
+            merchant_name: curr.merchants?.name ?? "-",
+            total_sold: 0, // Ini tetap dijaga
+            _total_in: 0, // Pakai underscore buat penanda bakal dibuang
+            _total_settle: 0,
+            current_stock: 0,
+          };
+        }
+
+        if (curr.type === "IN") {
+          acc[pId]._total_in += curr.quantity;
+        } else if (curr.type === "OUT_SOLD") {
+          acc[pId].total_sold += curr.quantity;
+        } else if (curr.type === "OUT_SETTLE") {
+          acc[pId]._total_settle += curr.quantity;
+        }
+
+        // Rumus saldo akhir tetap sama
+        acc[pId].current_stock =
+          acc[pId]._total_in - acc[pId].total_sold - acc[pId]._total_settle;
+
+        return acc;
+      },
+      {} as Record<string, SettlementGroupedItem>,
+    );
+
+    // 4. Filter stok > 0 & Buang yang gak disuruh tampil (in & settle)
+    const finalData: SettlementProduct[] = Object.values(grouped)
+      .filter((item: any) => item.current_stock > 0)
+      .map(({ _total_in, _total_settle, ...rest }) => rest);
+
+    return {
+      data: finalData,
+      total: finalData.length,
+    };
+  };
+
   return {
     fetchStock,
     addBulkStock,
     settleProduct,
     updateStockLog,
     deleteStockLog,
+    checkExistingStock,
+    fetchSettlementWorklist,
   };
 };

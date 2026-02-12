@@ -1,53 +1,35 @@
 <script setup lang="ts">
 const route = useRoute();
+const pageTitle = computed(() => route.meta.title || "Detail");
 
-useSeoMeta({
-  title: `TigaJajan POS | ${route.meta.title}`,
-  ogTitle: `TigaJajan POS | ${route.meta.title}`,
-  description: "",
-  ogDescription: "",
+useHead({
+  title: computed(() => `TigaJajan POS | ${pageTitle.value}`),
 });
 </script>
 
-<!--<template>-->
-<!--  <div class="min-h-screen bg-background">-->
-<!--    <div class="fixed top-0 left-0 right-0 z-50 px-6 pt-4">-->
-<!--      <header class="max-w-md mx-auto h-14 flex items-center justify-between">-->
-<!--        <button-->
-<!--          @click="$router.back()"-->
-<!--          class="size-10 rounded-xl bg-secondary flex items-center justify-center"-->
-<!--        >-->
-<!--          <Icon name="lucide:chevron-left" class="size-6 text-foreground" />-->
-<!--        </button>-->
-<!--      </header>-->
-<!--    </div>-->
-<!--    <main class="p-6 pt-24">-->
-<!--      <slot />-->
-<!--    </main>-->
-<!--  </div>-->
-<!--</template>-->
 <template>
   <div class="min-h-screen bg-background">
-    <div class="fixed top-0 left-0 right-0 z-50 px-6 pt-6 pointer-events-none">
+    <div
+      class="fixed top-0 left-0 right-0 z-50 p-4 pointer-events-none bg-background"
+    >
       <div
-        class="max-w-md mx-auto flex items-center justify-between pointer-events-auto"
+        class="max-w-md mx-auto flex items-center justify-start pointer-events-auto gap-2"
       >
         <button
           @click="$router.back()"
-          class="size-11 rounded-2xl bg-foreground/5 backdrop-blur-xl border border-foreground/5 flex items-center justify-center transition-all active:scale-90 shadow-sm"
+          class="flex items-center justify-center transition-all active:scale-90"
         >
-          <Icon name="lucide:chevron-left" class="size-6 text-foreground" />
+          <Icon name="lucide:chevron-left" class="size-6 text-primary" />
         </button>
-
-        <div
-          class="size-11 rounded-2xl bg-foreground/5 backdrop-blur-xl border border-foreground/5 flex items-center justify-center"
+        <p
+          class="text-foreground text-lg font-semibold tracking-tight line-clamp-1"
         >
-          <Icon name="lucide:cookie" class="size-6 text-foreground" />
-        </div>
+          {{ pageTitle }}
+        </p>
       </div>
     </div>
 
-    <main class="px-6 pt-24">
+    <main class="px-6 pt-20">
       <slot />
     </main>
   </div>

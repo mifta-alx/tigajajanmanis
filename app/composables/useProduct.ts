@@ -206,10 +206,10 @@ export const useProduct = () => {
   };
 
   const fetchProductByMerchant = async (
-    merchantId: string | null | undefined,
     outletId: string | null | undefined,
+    merchantId: string | null | undefined,
   ): Promise<MerchantProduct[]> => {
-    if (!merchantId) return [];
+    if (!outletId || !merchantId) return [];
 
     const { data, error } = await supabase
       .from("products")
@@ -222,7 +222,7 @@ export const useProduct = () => {
       sku,
       image_url,
       merchants:merchant_id (name),
-      outlet_stocks!inner (
+      outlet_stocks (
         stock,
         outlet_id
       )
@@ -247,6 +247,7 @@ export const useProduct = () => {
         current_stock: m.outlet_stocks?.[0]?.stock ?? 0,
       };
     });
+
     return transformed;
   };
 

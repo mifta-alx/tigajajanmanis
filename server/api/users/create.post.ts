@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     config.public.supabaseUrl,
     config.supabaseServiceKey,
   );
-
+  console.log(body);
   const { data, error } = await supabaseAdmin.auth.admin.createUser({
     email: `${body.username}@tigajajanmanis.com`,
     password: body.password,
@@ -24,6 +24,7 @@ export default defineEventHandler(async (event) => {
       fullname: body.fullname,
       phone_number: body.phone_number,
       address: body.address,
+      outlet_id: body.outlet_id,
       role: body.role,
     },
   });
