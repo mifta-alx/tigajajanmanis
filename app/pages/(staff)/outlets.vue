@@ -97,7 +97,7 @@ const handleToggle = () => {
 
       <OutletsSummary
         :summary="summaryTransactions"
-        :pending="pendingSummary && !summerTransactions"
+        :pending="pendingSummary && !summaryTransactions"
       />
 
       <ClientOnly>
