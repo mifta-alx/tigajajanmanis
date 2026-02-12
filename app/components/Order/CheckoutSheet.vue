@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { DrawerPayment } from "#components";
+import { ChevronLeft } from "lucide-vue-next";
 
 const props = defineProps<{
   modelValue: boolean;
@@ -153,7 +154,7 @@ onUnmounted(() => {
               "
               class="flex items-center justify-center transition-all active:scale-90"
             >
-              <Icon name="lucide:chevron-left" class="size-6 text-primary" />
+              <ChevronLeft class="size-6 text-primary" />
             </button>
             <p
               class="text-foreground text-lg font-semibold tracking-tight line-clamp-1"
