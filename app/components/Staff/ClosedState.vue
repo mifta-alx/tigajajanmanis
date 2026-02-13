@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col items-center justify-center py-40 animate-in fade-in zoom-in-95 duration-500"
+    class="flex-1 flex flex-col items-center justify-center animate-in fade-in zoom-in-95 duration-500"
   >
     <div class="relative flex items-center justify-center mb-8">
       <div
@@ -40,4 +40,3 @@
     </NuxtLink>
   </div>
 </template>
-<script setup lang="ts"></script>

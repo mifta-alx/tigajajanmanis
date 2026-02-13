@@ -9,7 +9,7 @@ useHead({
 </script>
 
 <template>
-  <div class="min-h-screen bg-background">
+  <div class="bg-background">
     <div
       class="fixed top-0 left-0 right-0 z-50 p-4 pointer-events-none bg-background"
     >
@@ -30,7 +30,7 @@ useHead({
       </div>
     </div>
 
-    <main class="px-6 pt-20">
+    <main class="flex-1 px-6 pt-20 flex flex-col">
       <slot />
     </main>
   </div>

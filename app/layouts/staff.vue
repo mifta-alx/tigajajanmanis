@@ -13,14 +13,14 @@ useHead({
     <NavHeader v-if="!route.meta.hideHeader" />
     <main class="w-full lg:max-w-xl px-6 transition-all duration-300">
       <slot />
-      <ClientOnly>
-        <div
-          v-if="!activeOutlet?.is_open && route.path !== '/outlets'"
-          class="absolute inset-0 z-30 bg-background pt-20 px-6"
-        >
-          <StaffClosedState />
-        </div>
-      </ClientOnly>
+      <div
+        v-if="
+          activeOutlet && !activeOutlet.is_open && route.path !== '/outlets'
+        "
+        class="fixed inset-0 z-30 bg-background flex flex-col items-center justify-center animate-in fade-in duration-300"
+      >
+        <StaffClosedState />
+      </div>
     </main>
     <AppBottomNav />
   </div>
