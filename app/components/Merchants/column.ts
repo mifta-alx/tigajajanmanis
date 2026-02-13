@@ -66,15 +66,7 @@ export const getColumns = (
       return h(
         "div",
         { class: "flex flex-wrap gap-1.5" },
-        names.map((name) =>
-          h(
-            Badge,
-            {
-              variant: "outline",
-            },
-            () => name,
-          ),
-        ),
+        names.map((name) => h(Badge, () => name)),
       );
     },
   },
