@@ -29,6 +29,11 @@ export const breadcrumbList: Record<string, BreadcrumbStep[]> = {
     { label: "Dashboard", href: "/admin/dashboard" },
     { label: "Sales" },
   ],
+  "/admin/sales/:id": [
+    { label: "Dashboard", href: "/admin/dashboard" },
+    { label: "Sales", href: "/admin/sales" },
+    { label: "Detail Transaksi" },
+  ],
   "/admin/users": [
     { label: "Dashboard", href: "/admin/dashboard" },
     { label: "Users" },

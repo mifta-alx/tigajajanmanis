@@ -60,9 +60,9 @@ const items = [
         <SidebarMenuItem>
           <SidebarMenuButton
             as-child
-            class="data-[slot=sidebar-menu-button]:!p-1.5"
+            class="data-[slot=sidebar-menu-button]:!p-1.5 hover:bg-transparent hover:text-foreground"
           >
-            <a href="#">
+            <a href="/">
               <Icon name="lucide:cookie" class="!size-5" />
               <span class="text-base font-semibold">TigaJajan.</span>
             </a>
