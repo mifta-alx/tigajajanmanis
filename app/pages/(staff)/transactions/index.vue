@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// import type { Transaction } from "~/types/models";
 import { today, getLocalTimeZone } from "@internationalized/date";
 import { formatDate } from "~/lib/utils";
 
@@ -12,7 +11,7 @@ definePageMeta({
 
 const todayString = new Date();
 
-const formattedDate = formatDate(todayString, "EEEE, d MMM yyyy");
+const formattedDate = formatDate(todayString.toString(), "EEEE, d MMM yyyy");
 
 const thisDay = ref(today(getLocalTimeZone()).toString());
 const user = useSupabaseUser();
