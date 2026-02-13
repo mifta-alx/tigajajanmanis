@@ -8,13 +8,7 @@ import DeleteDialog from "~/components/DeleteDialog.vue";
 definePageMeta({
   layout: "admin",
   middleware: ["auth"],
-});
-
-useSeoMeta({
-  title: "TigaJajan POS | Outlet",
-  ogTitle: "TigaJajan POS | Outlet",
-  description: "",
-  ogDescription: "",
+  title: "Outlet",
 });
 
 const isModalOpen = ref(false);
@@ -156,7 +150,7 @@ const confirmDeleteOutlet = async () => {
             </InputGroupAddon>
           </InputGroup>
         </div>
-        <Button variant="outline" :disabled="pending" @click="openAddModal"
+        <Button :disabled="pending" @click="openAddModal"
           ><Icon name="lucide:plus" />
           <span class="hidden lg:inline">Add Outlet</span></Button
         >

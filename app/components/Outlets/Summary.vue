@@ -20,7 +20,7 @@ import { formatNumberPrice } from "~/lib/utils";
         <h3
           class="text-[40px] font-bold tracking-tighter text-primary-foreground leading-none"
         >
-          {{ formatNumberPrice(summary.profit) }}
+          {{ formatNumberPrice(summary.revenue) }}
         </h3>
         <div
           v-if="summary.comparison.trend !== 'stagnant'"

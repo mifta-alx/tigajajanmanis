@@ -13,20 +13,18 @@ const user = useSupabaseUser();
 const colorMode = useColorMode();
 const { getTransactionSummary } = useTransaction();
 const thisDay = today(getLocalTimeZone()).toString();
-const outletId = computed(() => user.value?.user_metadata?.outlet_id || "-");
+const outletId = computed(() => user.value?.user_metadata?.outlet_id);
 
 const summaryTransactions = useState<any>("summary_cache", () => null);
 
-const { pending: pendingSummary } = useLazyAsyncData(
-  "outlet-page-summary",
+const { data: summary, pending: pendingSummary } = useLazyAsyncData(
+  "outlet-summary",
   async () => {
-    if (!outletId.value || outletId.value === "-") return null;
-    const data = await getTransactionSummary({
+    if (!outletId.value) return null;
+    return await getTransactionSummary({
       date: thisDay,
       outletId: outletId.value,
     });
-    summaryTransactions.value = data;
-    return data;
   },
 );
 
@@ -50,13 +48,18 @@ const initials = computed(() => {
 
 const { activeOutlet, fetchActiveOutlet, toggleStatusOpen } = useOutlet();
 
-const { pending } = await useAsyncData("active-outlet-init", async () => {
-  const outletId = user.value?.user_metadata?.outlet_id;
-  if (outletId && !activeOutlet.value) {
-    return await fetchActiveOutlet(outletId);
-  }
-  return activeOutlet.value;
-});
+const { pending: pendingOutlet } = useLazyAsyncData(
+  "active-outlet-init",
+  async () => {
+    const id = user.value?.user_metadata?.outlet_id;
+    if (id && !activeOutlet.value) {
+      return await fetchActiveOutlet(id);
+    }
+    return activeOutlet.value;
+  },
+);
+
+const isInitialLoading = computed(() => pendingOutlet.value);
 
 const handleToggle = () => {
   if (!activeOutlet.value) return;
@@ -66,7 +69,7 @@ const handleToggle = () => {
 
 <template>
   <div class="pb-10 pt-6">
-    <OutletsStaffSkeleton v-if="pending" />
+    <OutletsStaffSkeleton v-if="isInitialLoading" />
     <div class="space-y-6" v-else>
       <div class="flex items-center justify-between px-1 pt-4">
         <div class="space-y-0.5">
@@ -96,7 +99,7 @@ const handleToggle = () => {
       </div>
 
       <OutletsSummary
-        :summary="summaryTransactions"
+        :summary="summary"
         :pending="pendingSummary && !summaryTransactions"
       />
 
