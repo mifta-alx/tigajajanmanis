@@ -114,7 +114,7 @@ const confirmDeleteStockLog = async () => {
             v-model="filterDate"
             class="flex flex-1 sm:flex-none sm:w-max"
           />
-          <Button variant="outline" :disabled="pending" @click="openAddModal"
+          <Button :disabled="pending" @click="openAddModal"
             ><Icon name="lucide:plus" />
             <span class="hidden lg:inline">Add Stock</span></Button
           >
