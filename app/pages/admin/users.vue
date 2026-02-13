@@ -158,7 +158,7 @@ const confirmDeleteUser = async () => {
             </InputGroupAddon>
           </InputGroup>
         </div>
-        <Button variant="outline" :disabled="pending" @click="openAddModal"
+        <Button :disabled="pending" @click="openAddModal"
           ><Icon name="lucide:plus" />
           <span class="hidden lg:inline">Add User</span></Button
         >
