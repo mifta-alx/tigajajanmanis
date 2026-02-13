@@ -59,7 +59,7 @@ const filteredProducts = computed(() => {
 </script>
 
 <template>
-  <div :class="['space-y-6 pt-24', totalItems > 0 && 'pb-28']">
+  <div :class="['space-y-6 pt-24', totalItems > 0 ? 'pb-28' : 'pb-8']">
     <StaffPageHeader
       title="Katalog"
       description="Produk"
