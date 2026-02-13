@@ -44,6 +44,7 @@ const handleLogin = async () => {
     );
     if (error) {
       showAlert.value = true;
+      isNavigating.value = false;
       errorMessage.value = error;
       isNavigating.value = false;
       setTimeout(() => {
@@ -54,11 +55,13 @@ const handleLogin = async () => {
 
     const role = data.user.app_metadata.role;
     const destination = role !== "admin" ? "/products" : "/admin/dashboard";
-    window.location.href = destination;
+    await navigateTo(destination, {
+      replace: true,
+      external: false,
+    });
   } catch (err) {
-    console.error("Login catch error:", err);
-  } finally {
     isNavigating.value = false;
+    console.error("Login catch error:", err);
   }
 };
 
