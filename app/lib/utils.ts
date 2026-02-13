@@ -80,6 +80,10 @@ export const getImage = (name: string, image: string) => {
   return `https://placehold.co/100x100?text=${firstLetter}`;
 };
 
-export function formatDate(date: Date, dateFormat = "MMM dd, yyyy") {
-  return format(date, dateFormat, { locale: id });
+export function formatDate(
+  dateStr: string,
+  dateFormat: string = "MMM dd, yyyy",
+) {
+  if (!dateStr) return "-";
+  return format(new Date(dateStr), dateFormat, { locale: id });
 }

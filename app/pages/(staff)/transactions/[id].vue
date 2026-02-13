@@ -3,6 +3,10 @@ import { cn, formatNumberPrice, formatPrice } from "~/lib/utils";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import type { PaymentMethodType, TransactionStatusType } from "~/types/models";
+import {
+  PaymentMethodString,
+  TransactionStatusConfig,
+} from "~/types/transaction";
 
 definePageMeta({
   layout: "focused",
@@ -33,47 +37,12 @@ const formatDate = (dateStr: string, formatStr: string) => {
   return format(new Date(dateStr), formatStr, { locale: id });
 };
 
-const paymentMethod = {
-  CASH: "Tunai",
-  DEBIT: "Debit",
-  QRIS: "QRIS Statis",
-  TRANSFER: "Transfer",
-};
-
-const statusConfig = {
-  COMPLETED: {
-    color: "text-emerald-500",
-    bg: "bg-emerald-500",
-    lightBg: "bg-emerald-500/10",
-    icon: "lucide:check",
-    label: "Berhasil",
-  },
-  PENDING: {
-    color: "text-amber-500",
-    bg: "bg-amber-500",
-    lightBg: "bg-amber-500/10",
-    icon: "lucide:clock",
-    label: "Pending",
-  },
-  CANCELLED: {
-    color: "text-red-500",
-    bg: "bg-red-500",
-    lightBg: "bg-red-500/10",
-    icon: "lucide:x",
-    label: "Dibatalkan",
-  },
-  REFUNDED: {
-    color: "text-blue-500",
-    bg: "bg-blue-500",
-    lightBg: "bg-blue-500/10",
-    icon: "lucide:rotate-ccw",
-    label: "Dikembalikan",
-  },
-};
-
 const currentStatus = computed(() => {
   const status = transaction.value?.status as TransactionStatusType;
-  return statusConfig[status] || statusConfig.PENDING;
+  return (
+    TransactionStatusConfig[status as keyof typeof TransactionStatusConfig] ||
+    TransactionStatusConfig.PENDING
+  );
 });
 </script>
 
@@ -145,7 +114,9 @@ const currentStatus = computed(() => {
         <div class="flex items-center justify-between gap-2">
           <p class="text-sm text-muted-foreground">Metode</p>
           <p class="text-sm font-medium text-foreground">
-            {{ paymentMethod[transaction.payment_type as PaymentMethodType] }}
+            {{
+              PaymentMethodString[transaction.payment_type as PaymentMethodType]
+            }}
           </p>
         </div>
         <div class="flex items-center justify-between gap-2">

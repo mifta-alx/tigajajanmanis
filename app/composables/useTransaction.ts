@@ -1,4 +1,7 @@
-import type { TransactionResponse } from "~/types/transaction";
+import type {
+  TransactionDetail,
+  TransactionResponse,
+} from "~/types/transaction";
 
 interface SummaryTrx {
   created_at: string;
@@ -60,8 +63,9 @@ export const useTransaction = () => {
   };
 
   const fetchTransactions = async (params: {
-    date: string;
+    date?: string;
     outletId?: string;
+    search?: string;
   }) => {
     const startDate = new Date(`${params.date}T00:00:00`);
     const endDate = new Date(`${params.date}T23:59:59`);
@@ -81,6 +85,10 @@ export const useTransaction = () => {
           status,
           total_items,
           total_price,
+          cashier_id,
+          profiles (
+            fullname
+          ),
           outlets (name),
           transaction_items (
             quantity,
@@ -91,12 +99,22 @@ export const useTransaction = () => {
         `,
         )
         .eq("status", "COMPLETED")
-        .gte("created_at", startDate.toISOString())
-        .lte("created_at", endDate.toISOString())
         .order("created_at", { ascending: false });
+
+      if (params.date) {
+        query = query
+          .gte("created_at", startDate.toISOString())
+          .lte("created_at", endDate.toISOString());
+      }
 
       if (params.outletId) {
         query = query.eq("outlet_id", params.outletId);
+      }
+
+      if (params.search) {
+        query = query.or(
+          `queue_number.ilike.%${params.search}%,invoice_number.ilike.%${params.search}%`,
+        );
       }
 
       const { data, error } = await query;
@@ -113,14 +131,12 @@ export const useTransaction = () => {
     date: string;
     outletId?: string;
   }) => {
-    const today = new Date(params.date);
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
+    const d = new Date(params.date);
+    d.setDate(d.getDate() - 2);
+    const yesterdayStr = d.toISOString().split("T")[0];
 
-    const startDate = new Date(
-      `${yesterday.toISOString().split("T")[0]}T00:00:00`,
-    );
-    const endDate = new Date(`${params.date}T23:59:59`);
+    const startDate = `${yesterdayStr}T00:00:00.000Z`;
+    const endDate = `${params.date}T23:59:59.999Z`;
 
     let query = supabase
       .from("transactions")
@@ -131,8 +147,8 @@ export const useTransaction = () => {
     `,
       )
       .eq("status", "COMPLETED")
-      .gte("created_at", startDate.toISOString())
-      .lte("created_at", endDate.toISOString());
+      .gte("created_at", startDate)
+      .lte("created_at", endDate);
 
     if (params.outletId) query = query.eq("outlet_id", params.outletId);
 
@@ -192,7 +208,9 @@ export const useTransaction = () => {
     };
   };
 
-  const getTransactionById = async (transactionId: string) => {
+  const getTransactionById = async (
+    transactionId: string,
+  ): Promise<TransactionDetail | null> => {
     try {
       const { data, error } = await supabase
         .from("transactions")
@@ -221,7 +239,11 @@ export const useTransaction = () => {
             selling_price_at_time,
             subtotal,
             products (
-              name
+              name,
+              image_url,
+              merchants(
+                name
+              )
             )
           )
         `,
