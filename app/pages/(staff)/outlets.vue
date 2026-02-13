@@ -74,7 +74,7 @@ const handleToggle = () => {
 </script>
 
 <template>
-  <div class="pb-10 pt-6">
+  <div class="pt-6 pb-8">
     <OutletsStaffSkeleton v-if="isInitialLoading" />
     <div class="space-y-6" v-else>
       <div class="flex items-center justify-between px-1 pt-4">

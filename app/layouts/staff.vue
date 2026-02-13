@@ -11,7 +11,7 @@ useHead({
 <template>
   <div class="min-h-screen bg-background flex justify-center">
     <NavHeader v-if="!route.meta.hideHeader" />
-    <main class="w-full lg:max-w-xl px-6 transition-all duration-300">
+    <main class="w-full lg:max-w-xl px-6 pb-16 transition-all duration-300">
       <slot />
       <div
         v-if="

@@ -35,7 +35,7 @@ const filteredMerchants = computed(() => {
 </script>
 
 <template>
-  <div class="space-y-6 pb-24 pt-24">
+  <div class="space-y-6 pb-8 pt-24">
     <StaffPageHeader
       title="Katalog"
       description="Inventaris"
