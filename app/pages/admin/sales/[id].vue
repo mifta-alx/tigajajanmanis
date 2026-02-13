@@ -29,7 +29,7 @@ const productColumns = computed(() => {
 
 <template>
   <div>
-    <SkeletonDetailTransactionAdmin v-if="pending" />
+    <SkeletonDetailTransactionAdmin v-if="pending && !transaction" />
     <div v-else-if="transaction" class="space-y-6">
       <div
         class="flex flex-col md:flex-row md:items-center justify-between gap-4 px-2"
