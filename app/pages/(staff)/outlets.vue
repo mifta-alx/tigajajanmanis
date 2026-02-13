@@ -17,14 +17,20 @@ const outletId = computed(() => user.value?.user_metadata?.outlet_id);
 
 const summaryTransactions = useState<any>("summary_cache", () => null);
 
-const { data: summary, pending: pendingSummary } = useLazyAsyncData(
+const { pending: pendingSummary } = useLazyAsyncData(
   "outlet-summary",
   async () => {
     if (!outletId.value) return null;
-    return await getTransactionSummary({
+    const data = await getTransactionSummary({
       date: thisDay,
       outletId: outletId.value,
     });
+
+    summaryTransactions.value = data;
+    return data;
+  },
+  {
+    watch: [outletId],
   },
 );
 
@@ -99,7 +105,7 @@ const handleToggle = () => {
       </div>
 
       <OutletsSummary
-        :summary="summary"
+        :summary="summaryTransactions"
         :pending="pendingSummary && !summaryTransactions"
       />
 
@@ -184,7 +190,7 @@ const handleToggle = () => {
         </p>
         <ClientOnly>
           <div
-            class="bg-card border border-border/60 rounded-[1.5rem] divide-y divide-border/40 overflow-hidden shadow-sm"
+            class="bg-card border border-border/60 rounded-[1.5rem] divide-y divide-border/40 overflow-hidden"
           >
             <button
               @click="toggleTheme"

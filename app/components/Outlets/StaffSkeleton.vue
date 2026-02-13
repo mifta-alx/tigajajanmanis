@@ -9,6 +9,9 @@
       <Skeleton class="size-12 rounded-2xl bg-muted" />
     </div>
     <Skeleton
+      class="w-full rounded-[1.5rem] border border-border/50 bg-muted h-32"
+    />
+    <Skeleton
       class="h-[74px] w-full rounded-[1.5rem] border border-border/50 bg-muted"
     />
     <div class="space-y-2">

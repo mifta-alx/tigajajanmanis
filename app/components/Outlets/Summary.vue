@@ -8,7 +8,7 @@ import { formatNumberPrice } from "~/lib/utils";
 
 <template>
   <Skeleton
-    v-if="pending || !summary"
+    v-if="pending && !summary"
     class="w-full bg-muted h-32 rounded-[1.5rem]"
   />
   <div v-else class="bg-primary p-5 rounded-[1.5rem]">
@@ -20,7 +20,7 @@ import { formatNumberPrice } from "~/lib/utils";
         <h3
           class="text-[40px] font-bold tracking-tighter text-primary-foreground leading-none"
         >
-          {{ formatNumberPrice(summary.revenue) }}
+          {{ formatNumberPrice(summary.revenue ?? 0) }}
         </h3>
         <div
           v-if="summary.comparison.trend !== 'stagnant'"
@@ -33,7 +33,10 @@ import { formatNumberPrice } from "~/lib/utils";
                 : 'lucide:arrow-down-right'
             "
           />
-          <span>{{ summary.comparison.percentage }}% dibandingkan kemarin</span>
+          <span
+            >{{ summary.comparison.percentage ?? 0 }}% dibandingkan
+            kemarin</span
+          >
         </div>
       </div>
     </div>
