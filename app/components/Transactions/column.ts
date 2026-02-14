@@ -100,6 +100,14 @@ export const getColumns = (): ColumnDef<any>[] => [
     },
   },
   {
+    accessorKey: "total_profit",
+    header: () => h("div", { class: "text-left" }, "Profit"),
+    cell: ({ row }) => {
+      const totalProfit = formatPrice(row.original.total_profit);
+      return h("div", { class: "text-wrap" }, totalProfit);
+    },
+  },
+  {
     accessorKey: "cashier_id",
     size: 120,
     header: () => h("div", { class: "text-left" }, "Staff"),

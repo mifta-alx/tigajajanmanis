@@ -41,6 +41,12 @@ export default defineNuxtConfig({
       secure: !process.dev,
     },
   },
+  echarts: {
+    renderer: ["canvas"],
+    charts: ["BarChart", "LineChart", "PieChart"],
+    components: ["DatasetComponent", "GridComponent", "TooltipComponent"],
+    features: ["LabelLayout", "UniversalTransition"],
+  },
 
   modules: [
     "@nuxt/icon",
@@ -48,6 +54,7 @@ export default defineNuxtConfig({
     "@nuxtjs/color-mode",
     "@nuxtjs/supabase",
     "@nuxt/image",
+    "nuxt-echarts",
   ],
   shadcn: {
     prefix: "",

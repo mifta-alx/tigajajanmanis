@@ -116,7 +116,8 @@ const confirmDeleteOutlet = async () => {
 </script>
 
 <template>
-  <div class="min-h-0 h-full">
+  <div class="min-h-0 h-full space-y-4">
+    <h2 class="text-2xl font-bold tracking-tight">Outlets</h2>
     <EmptyView
       v-if="!pending && outlets?.total === 0 && !debouncedSearch"
       icon="store"
