@@ -3,6 +3,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4">
       <Skeleton class="h-[218px] bg-muted rounded-xl" />
       <Skeleton class="h-[218px] bg-muted rounded-xl" />
+      <Skeleton class="h-[218px] bg-muted rounded-xl" />
       <Skeleton
         class="h-[218px] bg-muted rounded-xl sm:col-span-3 md:col-span-2"
       />
