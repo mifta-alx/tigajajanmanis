@@ -3,7 +3,6 @@ import type { CreateOutletDTO, Outlet, UpdateOutletDTO } from "~/types/outlet";
 export const useOutlet = () => {
   const supabase = useSupabaseClient();
   const activeOutlet = useState<any | null>("active-outlet", () => null);
-  const isChecking = ref(false);
 
   const fetchActiveOutlet = async (outletId: string) => {
     const { data, error } = await supabase

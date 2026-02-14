@@ -100,7 +100,7 @@ const productColumns = computed(() => {
             <p
               class="text-[10px] font-bold text-muted-foreground uppercase tracking-widest"
             >
-              Petugas
+              Staff
             </p>
             <p class="text-sm font-semibold">
               {{ transaction.profiles.fullname }}
@@ -120,7 +120,7 @@ const productColumns = computed(() => {
             <p
               class="text-[10px] font-bold text-muted-foreground uppercase tracking-widest"
             >
-              Waktu
+              Date & Time
             </p>
             <p class="text-sm font-semibold">
               {{ formatDate(transaction.created_at, "dd MMM yyyy, HH:mm") }}
@@ -151,7 +151,7 @@ const productColumns = computed(() => {
               }}</span>
             </div>
             <div class="flex justify-between text-sm text-muted-foreground">
-              <span>Pajak</span>
+              <span>Tax</span>
               <span class="font-bold text-emerald-600">Rp 0</span>
             </div>
             <div
@@ -167,13 +167,13 @@ const productColumns = computed(() => {
               <div
                 class="flex justify-between text-[10px] font-semibold uppercase opacity-50"
               >
-                <span>Diterima</span>
+                <span>Cash Received</span>
                 <span>{{ formatPrice(transaction.cash_received) }}</span>
               </div>
               <div
                 class="flex justify-between text-[10px] font-semibold uppercase text-primary"
               >
-                <span>Kembali</span>
+                <span>Change</span>
                 <span>{{ formatPrice(transaction.cash_change) }}</span>
               </div>
             </div>

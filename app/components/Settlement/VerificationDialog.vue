@@ -105,13 +105,14 @@ const isOpen = computed({
         <button
           @click="emit('confirm')"
           :disabled="isSubmitting"
-          class="w-full h-11 bg-primary text-primary-foreground rounded-full font-bold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+          class="w-full h-11 bg-primary text-primary-foreground rounded-full font-bold text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:grayscale disabled:opacity-50"
         >
           <Spinner v-if="isSubmitting" class="size-4" />
           <span v-else>Ya, proses pengembalian</span>
         </button>
 
         <button
+          :disabled="isSubmitting"
           @click="isOpen = false"
           class="w-full py-2 bg-card text-muted-foreground font-medium text-sm hover:bg-secondary transition-all"
         >

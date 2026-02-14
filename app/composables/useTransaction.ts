@@ -85,6 +85,7 @@ export const useTransaction = () => {
           status,
           total_items,
           total_price,
+          total_profit,
           cashier_id,
           profiles (
             fullname
