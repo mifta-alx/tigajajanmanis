@@ -116,7 +116,8 @@ const confirmDeleteProduct = async () => {
 </script>
 
 <template>
-  <div class="min-h-0 h-full">
+  <div class="min-h-0 h-full space-y-4">
+    <h2 class="text-2xl font-bold tracking-tight">Products</h2>
     <EmptyView
       v-if="!pending && products?.total === 0 && !debouncedSearch"
       icon="cake-slice"

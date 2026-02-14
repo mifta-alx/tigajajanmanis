@@ -68,7 +68,8 @@ const confirmReturnStock = async () => {
 </script>
 
 <template>
-  <div class="min-h-0 h-full">
+  <div class="min-h-0 h-full space-y-4">
+    <h2 class="text-2xl font-bold tracking-tight">Settlement</h2>
     <div class="space-y-4">
       <div class="flex flex-col sm:flex-row gap-4 items-center justify-between">
         <div class="w-full md:max-w-sm">
